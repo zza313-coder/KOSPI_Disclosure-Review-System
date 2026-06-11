@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRX KOSPI 공시 의무 종합 검토 시스템</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS Configuration for custom fonts and animations -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        krx: {
+                            navy: '#0A1D37',
+                            blue: '#114E9E',
+                            accent: '#F39C12',
+                            bg: '#F4F7FC',
+                            success: '#27AE60',
+                            danger: '#C0392B',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom styling for print & UI -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #F4F7FC;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-area {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+                background-color: white !important;
+                color: black !important;
+                padding: 0 !important;
+            }
+        }
+        /* Custom dynamic meter transition */
+        .gauge-transition {
+            transition: stroke-dashoffset 0.8s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-krx-navy text-white shadow-md border-b-4 border-krx-blue no-print">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-white/10 rounded-lg">
+                    <i data-lucide="scale" class="w-8 h-8 text-yellow-400"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">KOSPI 공시 의무 종합 검토 시스템</h1>
+                    <p class="text-xs text-slate-400">KRX 유가증권시장 공시규정 및 시행세칙 기준 (2026년 개정안 완벽 반영)</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="inline-flex items-center bg-slate-800 text-xs text-slate-300 px-3 py-1.5 rounded-full border border-slate-700">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+                    실무자 검토용 시뮬레이터 (기준일: 2026.06.11)
+                </span>
+                <button onclick="window.print()" class="bg-krx-blue hover:bg-blue-600 transition text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    보고서 인쇄
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-6">
+        
+        <!-- Left Sidebar: Financial Inputs & Selectable Events -->
+        <section class="w-full lg:w-5/12 space-y-6 no-print">
+            
+            <!-- NEW SMART FINTECH IMPORTER WIDGET -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 cursor-pointer" onclick="toggleImporter()">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="file-down" class="w-5 h-5 text-indigo-600"></i>
+                        <h2 class="font-bold text-slate-900">재무 데이터 스마트 임포터</h2>
+                    </div>
+                    <i data-lucide="chevron-down" id="importerChevron" class="w-4 h-4 text-slate-500 transition-transform duration-200"></i>
+                </div>
+                
+                <div id="importerContent" class="space-y-4 pt-1">
+                    <!-- Preset Buttons -->
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">더블유게임즈 2025년 결산 프리셋 (제14기)</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="loadDoubleUFiles('consolidated')" class="bg-krx-navy text-white text-xs font-bold py-2.5 px-3 rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-1.5 shadow-sm">
+                                <i data-lucide="layers" class="w-4 h-4 text-yellow-400"></i>
+                                연결 재무제표 로드
+                            </button>
+                            <button onclick="loadDoubleUFiles('separate')" class="bg-slate-100 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl hover:bg-slate-200 transition flex items-center justify-center gap-1.5 border border-slate-200">
+                                <i data-lucide="file-text" class="w-4 h-4 text-slate-500"></i>
+                                별도 재무제표 로드
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- File Drag & Drop -->
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">텍스트 파일(.txt) 업로드 및 파싱</span>
+                        <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center cursor-pointer hover:border-krx-blue hover:bg-slate-50 transition bg-white"
+                             onclick="document.getElementById('fileInput').click()"
+                             ondragover="handleDragOver(event)"
+                             ondragleave="handleDragLeave()"
+                             ondrop="handleFileDrop(event)">
+                            <i data-lucide="upload-cloud" class="w-7 h-7 text-slate-400 mx-auto mb-2"></i>
+                            <p class="text-xs font-semibold text-slate-700">이곳에 텍스트 파일을 끌어다 놓거나 클릭하세요</p>
+                            <p class="text-[10px] text-slate-400 mt-1">DART 등 요약 재무 테이블 자동 감지 지원</p>
+                            <input type="file" id="fileInput" class="hidden" accept=".txt,.json" onchange="handleFileSelect(event)">
+                        </div>
+                    </div>
+                    
+                    <!-- Text Area for copy paste -->
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">복사한 텍스트 붙여넣기</span>
+                        <textarea id="pasteArea" rows="3" class="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:border-krx-blue focus:ring-krx-blue font-medium bg-slate-50 focus:bg-white transition" placeholder="여기에 사업보고서 요약 재무표 텍스트나 데이터를 직접 붙여넣으셔도 자동으로 한글 키워드를 인식하여 완벽히 추출합니다."></textarea>
+                    </div>
+                    
+                    <!-- Parse Options -->
+                    <div class="flex items-center justify-between text-xs pt-1">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-500 font-semibold">단위 배율:</span>
+                            <select id="importUnitSelect" class="bg-white border border-slate-300 rounded-lg p-1.5 text-[11px] font-bold text-slate-700 focus:border-krx-blue outline-none cursor-pointer">
+                                <option value="auto">자동 감지 (Heuristic)</option>
+                                <option value="1">원 (Actual KRW)</option>
+                                <option value="1000">천 원</option>
+                                <option value="1000000">백만 원 (DART 표준)</option>
+                                <option value="100000000">억 원</option>
+                            </select>
+                        </div>
+                        <button onclick="parseAndApplyText()" class="bg-krx-blue hover:bg-blue-600 text-white font-bold text-xs py-2 px-3.5 rounded-xl transition shadow-sm flex items-center gap-1">
+                            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
+                            파싱 및 적용
+                        </button>
+                    </div>
+                    
+                    <!-- Feedback Notification -->
+                    <div id="importFeedback" class="hidden text-xs p-3 rounded-xl border transition-all duration-300">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Widget 1: Listing Company Financial Base Data -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="building-2" class="w-5 h-5 text-krx-blue"></i>
+                        <h2 class="font-bold text-slate-900">1. 기업 재무 기본정보 입력</h2>
+                    </div>
+                    <!-- Unit Selector Toggle -->
+                    <div class="flex bg-slate-100 p-1 rounded-lg">
+                        <button id="unitBtnWon" onclick="setUnit('won')" class="px-3 py-1 rounded text-xs font-semibold transition bg-white text-slate-800 shadow-sm">원 (KRW)</button>
+                        <button id="unitBtnEok" onclick="setUnit('eok')" class="px-3 py-1 rounded text-xs font-semibold transition text-slate-500 hover:text-slate-800">억 원</button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Asset Input -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-semibold text-slate-600 flex items-center gap-1">
+                                자산총액
+                                <span class="group relative cursor-pointer text-slate-400 hover:text-slate-600">
+                                    <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-56 p-2 bg-slate-900 text-white text-[11px] rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition z-50 leading-relaxed">
+                                        최근 사업연도말 재무제표 기준입니다. 2조 원 이상일 시 '대규모법인'으로 판정됩니다.
+                                    </span>
+                                </span>
+                            </label>
+                            <span id="labelAssetKrw" class="text-xs text-krx-blue font-medium">0원</span>
+                        </div>
+                        <div class="relative rounded-lg shadow-sm">
+                            <input type="text" id="inputAsset" oninput="handleFinancialInput('Asset', this.value)" class="block w-full rounded-lg border-slate-300 pr-12 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2.5 font-medium" placeholder="0">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <span class="text-slate-400 text-xs font-semibold" id="unitLabelAsset">원</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1.5 mt-1">
+                            <button onclick="addFinancialValue('Asset', 10)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">10억</button>
+                            <button onclick="addFinancialValue('Asset', 100)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">100억</button>
+                            <button onclick="addFinancialValue('Asset', 1000)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">1,000억</button>
+                            <button onclick="addFinancialValue('Asset', 20000)" class="text-[11px] bg-krx-blue/10 text-krx-blue px-2 py-1 rounded hover:bg-krx-blue/20 font-semibold">2조(대규모)</button>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Input -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-xs font-semibold text-slate-600 flex items-center gap-1">
+                                최근 사업연도 매출액
+                                <span class="group relative cursor-pointer text-slate-400 hover:text-slate-600">
+                                    <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-56 p-2 bg-slate-900 text-white text-[11px] rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition z-50 leading-relaxed">
+                                        영업정지, 공급계약 등 영업활동 관련 공시의 판단 기준이 됩니다.
+                                    </span>
+                                </span>
+                            </label>
+                            <span id="labelRevenueKrw" class="text-xs text-krx-blue font-medium">0원</span>
+                        </div>
+                        <div class="relative rounded-lg shadow-sm">
+                            <input type="text" id="inputRevenue" oninput="handleFinancialInput('Revenue', this.value)" class="block w-full rounded-lg border-slate-300 pr-12 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2.5 font-medium" placeholder="0">
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <span class="text-slate-400 text-xs font-semibold" id="unitLabelRevenue">원</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1.5 mt-1">
+                            <button onclick="addFinancialValue('Revenue', 10)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">10억</button>
+                            <button onclick="addFinancialValue('Revenue', 50)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">50억</button>
+                            <button onclick="addFinancialValue('Revenue', 500)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">500억</button>
+                            <button onclick="addFinancialValue('Revenue', 2000)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">2,000억</button>
+                        </div>
+                    </div>
+
+                    <!-- Row Grid: Equity vs Paid-in Capital -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Equity Input -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-slate-600 flex items-center gap-1">
+                                    자기자본
+                                    <span class="group relative cursor-pointer text-slate-400 hover:text-slate-600">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                                        <span class="absolute bottom-full left-[20%] mb-1 w-56 p-2 bg-slate-900 text-white text-[11px] rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition z-50 leading-relaxed">
+                                            자산총액 - 부채총액에 기초합니다. 만약 자본금 미만인 경우 자본금을 대체 자기자본으로 봅니다(규정 제3조 제5항).
+                                        </span>
+                                    </span>
+                                </label>
+                            </div>
+                            <div class="relative rounded-lg shadow-sm">
+                                <input type="text" id="inputEquity" oninput="handleFinancialInput('Equity', this.value)" class="block w-full rounded-lg border-slate-300 pr-10 focus:border-krx-blue focus:ring-krx-blue sm:text-xs border p-2 font-medium" placeholder="0">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <span class="text-slate-400 text-[10px] font-semibold" id="unitLabelEquity">원</span>
+                                </div>
+                            </div>
+                            <span id="labelEquityKrw" class="text-[10px] text-slate-500 block mt-1 overflow-hidden text-ellipsis whitespace-nowrap">0원</span>
+                        </div>
+
+                        <!-- Paid-in Capital Input -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-slate-600 flex items-center gap-1">
+                                    자본금
+                                </label>
+                            </div>
+                            <div class="relative rounded-lg shadow-sm">
+                                <input type="text" id="inputPaidCapital" oninput="handleFinancialInput('PaidCapital', this.value)" class="block w-full rounded-lg border-slate-300 pr-10 focus:border-krx-blue focus:ring-krx-blue sm:text-xs border p-2 font-medium" placeholder="0">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <span class="text-slate-400 text-[10px] font-semibold" id="unitLabelPaidCapital">원</span>
+                                </div>
+                            </div>
+                            <span id="labelPaidCapitalKrw" class="text-[10px] text-slate-500 block mt-1 overflow-hidden text-ellipsis whitespace-nowrap">0원</span>
+                        </div>
+                    </div>
+
+                    <!-- Adjusted Equity Info Banner -->
+                    <div id="adjustedEquityBanner" class="hidden bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 text-xs flex items-start gap-2">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <span class="font-bold">자본잠식 조정 규정 적용(제3조 제5항):</span> 자기자본이 자본금 미만입니다. 자본금인 <span id="adjustedEquityVal" class="font-bold"></span> 을 자기자본 임계 판단 기준으로 설정합니다.
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Widget 2: Disclosure Item Browser & Search -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="border-b border-slate-100 pb-3 mb-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="file-search" class="w-5 h-5 text-krx-blue"></i>
+                        <h2 class="font-bold text-slate-900">2. 공시 대상 유형 선택</h2>
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative mb-3">
+                    <input type="text" id="disclosureSearch" oninput="filterDisclosureItems()" class="block w-full rounded-lg border-slate-300 pl-9 pr-3 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2" placeholder="공시 유형 또는 키워드 검색 (예: 계약, 유형자산)...">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                    </div>
+                </div>
+
+                <!-- Category Filtering Chips -->
+                <div class="flex flex-wrap gap-1.5 mb-4">
+                    <button onclick="filterCategory('all')" id="catBtn_all" class="text-xs bg-krx-blue text-white font-semibold px-3 py-1 rounded-full transition shadow-sm">전체</button>
+                    <button onclick="filterCategory('영업 및 생산활동')" id="catBtn_영업" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition">영업·생산</button>
+                    <button onclick="filterCategory('투자 및 자산 활동')" id="catBtn_투자" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition">투자·자산</button>
+                    <button onclick="filterCategory('채무 및 재무 구조')" id="catBtn_채무" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition">채무·재무</button>
+                    <button onclick="filterCategory('손실 및 재해')" id="catBtn_손실" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition">손실·재해</button>
+                </div>
+
+                <!-- Dynamic Item List Container -->
+                <div id="disclosureItemsContainer" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                    <!-- Loaded dynamically from JS -->
+                </div>
+            </div>
+
+            <!-- Widget 3: Event Value / Transaction Amount Input -->
+            <div id="eventAmountWidget" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 opacity-50 pointer-events-none transition-all duration-300">
+                <div class="border-b border-slate-100 pb-3 mb-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="coins" class="w-5 h-5 text-krx-blue"></i>
+                        <h2 class="font-bold text-slate-900">3. 발생 사건/거래 금액 입력</h2>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label id="eventAmountLabel" class="text-xs font-semibold text-slate-600">거래 금액</label>
+                        <span id="labelEventAmountKrw" class="text-xs text-krx-blue font-medium">0원</span>
+                    </div>
+                    <div class="relative rounded-lg shadow-sm">
+                        <input type="text" id="inputEventAmount" oninput="handleEventAmountInput(this.value)" class="block w-full rounded-lg border-slate-300 pr-12 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2.5 font-medium" placeholder="0">
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span class="text-slate-400 text-xs font-semibold" id="unitLabelEvent">원</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-1.5 mt-1">
+                        <button onclick="addEventValue(1)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">+1억</button>
+                        <button onclick="addEventValue(10)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">+10억</button>
+                        <button onclick="addEventValue(50)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">+50억</button>
+                        <button onclick="addEventValue(100)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">+100억</button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Content: Live Assessment Engine & Exportable Report -->
+        <section class="w-full lg:w-7/12 space-y-6">
+            
+            <!-- Dynamic Result Card -->
+            <div id="resultCard" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden transition-all duration-500">
+                
+                <!-- Absolute background pulse for visual feedback -->
+                <div id="resultPulseBg" class="absolute inset-0 bg-slate-50 transition-colors duration-500 -z-10"></div>
+
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-5">
+                    <div>
+                        <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">공무 검토 진단 결과</span>
+                        <h2 class="text-xl font-extrabold text-slate-900" id="selectedDisclosureTitle">검토 대상 공시를 선택해 주세요</h2>
+                        <p class="text-xs text-slate-500 mt-1" id="selectedDisclosureCategory">-</p>
+                    </div>
+                    <!-- Badge representing general vs large corp classification -->
+                    <span id="corpBadge" class="inline-flex items-center bg-blue-50 text-blue-800 text-xs font-bold px-3 py-1 rounded-full border border-blue-100 shadow-sm whitespace-nowrap">
+                        <i data-lucide="award" class="w-3.5 h-3.5 mr-1 text-blue-600"></i>
+                        규모 미확정
+                    </span>
+                </div>
+
+                <!-- Initial prompt state -->
+                <div id="resultInitialState" class="py-12 text-center text-slate-400 flex flex-col items-center justify-center space-y-3">
+                    <i data-lucide="shield-alert" class="w-16 h-16 text-slate-300 animate-bounce"></i>
+                    <p class="font-medium text-slate-500">왼쪽 패널에서 재무정보와 공시유형을 입력해 주세요.</p>
+                    <p class="text-xs text-slate-400">규정 기준선 초과 시 즉각적인 경고 및 일정가이드를 제공합니다.</p>
+                </div>
+
+                <!-- Analysis Details Section (Hidden until valid inputs) -->
+                <div id="resultAnalysisArea" class="hidden space-y-6">
+                    
+                    <!-- Major Diagnostic Verdict Banner -->
+                    <div id="verdictBanner" class="p-5 rounded-2xl flex items-start gap-4 transition-all duration-300">
+                        <div id="verdictIconBox" class="p-3 rounded-xl">
+                            <!-- Icon injected dynamically -->
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold" id="verdictHeadline">-</h3>
+                            <p class="text-xs mt-1 leading-relaxed" id="verdictMessage">-</p>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Metrics Matrix & Charts -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
+                        <!-- Mini metrics table -->
+                        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col justify-between space-y-3">
+                            <h4 class="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                                <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-slate-500"></i>
+                                세부 산출 지표
+                            </h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-500">회사 기준 재무 지표 (<span id="calcBaseType" class="font-semibold">-</span>)</span>
+                                    <span class="font-semibold" id="calcBaseValue">-</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-500">법정 공시 기준 의무 비율</span>
+                                    <span class="font-extrabold text-krx-blue" id="calcRequiredRatio">-</span>
+                                </div>
+                                <div class="flex justify-between py-1 border-b border-slate-100">
+                                    <span class="text-slate-500">의무 발생 최소 임계금액</span>
+                                    <span class="font-extrabold text-rose-600" id="calcMinTriggerAmount">-</span>
+                                </div>
+                                <div class="flex justify-between py-1 pt-2 font-bold text-slate-900">
+                                    <span>검토 대상 사건 거래금액</span>
+                                    <span id="calcActualValue" class="text-indigo-600">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Meter Circle -->
+                        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col items-center justify-center text-center">
+                            <h4 class="text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-2 self-start flex items-center gap-1">
+                                <i data-lucide="activity" class="w-3.5 h-3.5 text-slate-500"></i>
+                                공시 도달 위험 게이지
+                            </h4>
+                            
+                            <div class="relative w-32 h-32 flex items-center justify-center">
+                                <!-- SVG Circle Gauge -->
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="64" cy="64" r="50" stroke="#E2E8F0" stroke-width="12" fill="transparent" />
+                                    <circle id="gaugeProgressCircle" cx="64" cy="64" r="50" stroke="#114E9E" stroke-width="12" fill="transparent" 
+                                            stroke-dasharray="314.16" stroke-dashoffset="314.16" class="gauge-transition" stroke-linecap="round"/>
+                                </svg>
+                                <div class="absolute flex flex-col items-center justify-center">
+                                    <span id="gaugePercentage" class="text-2xl font-black text-slate-800">0%</span>
+                                    <span class="text-[9px] text-slate-500 uppercase tracking-widest font-semibold">도달율</span>
+                                </div>
+                            </div>
+                            <span id="gaugeStatusText" class="text-xs font-bold mt-2 text-slate-600">-</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Rule Information Accordion details -->
+                    <div class="border-t border-slate-100 pt-5 space-y-4">
+                        
+                        <!-- Accordion 1: Citation & Reporting Limit -->
+                        <div class="flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <i data-lucide="info" class="w-5 h-5 text-krx-blue mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">규정 조항 및 신고 시한 정보</h4>
+                                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                                    이 공시사항은 <strong id="ruleCitation" class="text-slate-800">-</strong> 에 해당됩니다.
+                                    <br>공시 시한: <strong id="ruleDeadline" class="text-krx-blue">-</strong>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Accordion 2: Guidance / Documents to Prepare -->
+                        <div class="flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <i data-lucide="clipboard-list" class="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900">상장법인 실무 준비 권고사항</h4>
+                                <ul class="list-disc pl-4 text-xs text-slate-600 mt-1 space-y-1" id="rulePreps">
+                                    <li>사유발생 당일 거래소 전자공시시스템(KIND)을 통한 즉각적인 입력이 필요합니다.</li>
+                                    <li>이사회 의사록 원본 및 관련 계약서 등 증빙 서류를 확보해야 합니다.</li>
+                                    <li>사외이사의 이사회 참석 여부를 공시 시 명확히 부기하여야 합니다.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Print / Exportable Assessment Report (Designed nicely for printing) -->
+            <div id="printReportArea" class="hidden print-area bg-white p-8 rounded-2xl border border-slate-300 shadow-sm relative text-black leading-relaxed">
+                <!-- Watermark -->
+                <div class="absolute inset-0 opacity-[0.03] pointer-events-none flex items-center justify-center overflow-hidden">
+                    <span class="text-[120px] font-black tracking-widest uppercase transform rotate-45 select-none text-slate-800">CONFIDENTIAL</span>
+                </div>
+
+                <div class="text-center border-b-2 border-slate-800 pb-5 mb-6">
+                    <h2 class="text-2xl font-extrabold tracking-wide uppercase">공시 의무 자체 검토 의견서</h2>
+                    <p class="text-xs text-slate-500 mt-1">유가증권시장 공시규정 제7조 (주요경영사항 등) 실무 심사 결과</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-xs mb-6">
+                    <div>
+                        <p><strong>발행인:</strong> 유가증권시장 주권상장법인</p>
+                        <p><strong>진단 기준일:</strong> 2026년 06월 11일</p>
+                        <p><strong>심사 법인규모:</strong> <span id="printCorpScale" class="font-bold">-</span></p>
+                    </div>
+                    <div class="text-right">
+                        <p><strong>심사 규정:</strong> KRX 유가증권시장 공시규정</p>
+                        <p><strong>상태:</strong> <span id="printVerdictStatus" class="font-bold">-</span></p>
+                    </div>
+                </div>
+
+                <h3 class="text-sm font-bold border-l-4 border-slate-800 pl-2 mb-3 uppercase tracking-wider">1. 기초 재무 현황</h3>
+                <table class="w-full border-collapse border border-slate-300 text-xs text-left mb-6">
+                    <thead>
+                        <tr class="bg-slate-100">
+                            <th class="border border-slate-300 p-2">자산총액</th>
+                            <th class="border border-slate-300 p-2">최근 사업연도 매출액</th>
+                            <th class="border border-slate-300 p-2">자기자본</th>
+                            <th class="border border-slate-300 p-2">자본금</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border border-slate-300 p-2" id="printAsset">-</td>
+                            <td class="border border-slate-300 p-2" id="printRevenue">-</td>
+                            <td class="border border-slate-300 p-2" id="printEquity">-</td>
+                            <td class="border border-slate-300 p-2" id="printPaidCapital">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 class="text-sm font-bold border-l-4 border-slate-800 pl-2 mb-3 uppercase tracking-wider">2. 검토 대상 사건 및 결과</h3>
+                <table class="w-full border-collapse border border-slate-300 text-xs text-left mb-6">
+                    <tbody>
+                        <tr>
+                            <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">대상 공시명</th>
+                            <td class="border border-slate-300 p-2" id="printDisclosureTitle">-</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">해당 근거 조항</th>
+                            <td class="border border-slate-300 p-2" id="printRuleCitation">-</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">사건 발생/거래액</th>
+                            <td class="border border-slate-300 p-2 font-bold" id="printActualValue">-</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">법정 공시 기준선</th>
+                            <td class="border border-slate-300 p-2" id="printTriggerValue">-</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">공시 자가 진단</th>
+                            <td class="border border-slate-300 p-2 font-bold" id="printVerdictResult">-</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">보고 시한</th>
+                            <td class="border border-slate-300 p-2" id="printDeadline">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 class="text-sm font-bold border-l-4 border-slate-800 pl-2 mb-3 uppercase tracking-wider">3. 실무자 검토 소견</h3>
+                <div class="border border-slate-300 rounded p-3 text-xs leading-relaxed bg-slate-50 mb-8" id="printOpinion">
+                    -
+                </div>
+
+                <div class="flex justify-between items-end mt-12 text-xs">
+                    <div class="text-slate-500">
+                        * 본 보고서는 KRX 상장법인 공시 자가 검토용 툴에 의해 자체 작성되었으며,<br>정식 유고 판단은 공식 법률전문가 및 한국거래소 공시관리부를 통해 재검토 하십시오.
+                    </div>
+                    <div class="text-center w-48">
+                        <p class="mb-8">검토담당 사외이사 / 공시책임자</p>
+                        <p class="border-t border-slate-400 pt-1 text-slate-600">(인 또는 서명)</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Bottom Secondary Features: Penalty Estimator, Regulations Helper -->
+    <section class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-12 space-y-6 no-print">
+        
+        <!-- Tab Controls Header -->
+        <div class="border-b border-slate-200">
+            <nav class="flex space-x-6" aria-label="Tabs">
+                <button onclick="switchTab('penalty')" id="tabBtn_penalty" class="border-b-2 border-krx-blue text-krx-blue px-1 pb-4 text-sm font-bold flex items-center gap-2">
+                    <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+                    불성실공시 제재 위험도 심뮬레이터
+                </button>
+                <button onclick="switchTab('guide')" id="tabBtn_guide" class="border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 px-1 pb-4 text-sm font-semibold flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    주요 공시 규정 실무 가이드 요약
+                </button>
+                <button onclick="switchTab('qa')" id="tabBtn_qa" class="border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 px-1 pb-4 text-sm font-semibold flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-4 h-4"></i>
+                    공시 실무 질의응답 (Q&A 헬퍼)
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab 1: Penalty Risk simulation based on Star [별표 2] -->
+        <div id="tabContent_penalty" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="md:col-span-1 space-y-4">
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i data-lucide="alert-octagon" class="w-5 h-5 text-amber-500"></i>
+                    불성실공시 리스크 조건
+                </h3>
+                <p class="text-xs text-slate-500">공시불이행, 번복, 변경이 발생할 경우 규정 제35조 및 [별표 2] 심의기준에 의해 벌점 및 제재금이 부과될 수 있습니다.</p>
+                
+                <!-- Factor A: Intention -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">위반의 동기 (귀책 범위)</label>
+                    <select id="penaltyMotive" onchange="calculatePenaltyEstimate()" class="block w-full rounded-lg border-slate-300 text-sm p-2 bg-slate-50 border">
+                        <option value="simple">경과실 (통상적인 과실/기재 실수)</option>
+                        <option value="gross">중과실 (부서 간 공문 공유 누락 등)</option>
+                        <option value="willful">고의 (의도적 누락 및 장기 지연)</option>
+                    </select>
+                </div>
+
+                <!-- Factor B: Impact / Importance -->
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">위반의 중요성 (투자 영향 규모)</label>
+                    <select id="penaltyImportance" onchange="calculatePenaltyEstimate()" class="block w-full rounded-lg border-slate-300 text-sm p-2 bg-slate-50 border">
+                        <option value="minor">경미한 위반 (미달 상태에 근접하거나 영향 작음)</option>
+                        <option value="moderate">보통의 위반 (공시 비율을 상당 수준 초과)</option>
+                        <option value="severe">중대한 위반 (회사의 존립 위협 수준 또는 시황 왜곡)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 bg-slate-50 rounded-2xl p-6 border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <h4 class="text-sm font-bold text-slate-900 mb-3">심의 제재 추정 보고서</h4>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">추정 부과 벌점</span>
+                            <p class="text-3xl font-black text-rose-600 mt-1" id="estPoints">0점</p>
+                            <p class="text-[10px] text-slate-500 mt-1" id="estPointsDetails">-</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">추정 추가 공시위반제재금</span>
+                            <p class="text-2xl font-bold text-krx-blue mt-1" id="estFines">0원</p>
+                            <p class="text-[10px] text-slate-500 mt-1">부과벌점 5점 이상 시 부과 가능 (시행세칙 제13조의3)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 text-xs flex items-start gap-3">
+                    <i data-lucide="shield-alert" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <h5 class="font-bold mb-1">상장 관리자 체크 포인트:</h5>
+                        <ul class="list-disc pl-4 space-y-1 text-slate-700 leading-relaxed">
+                            <li><strong>누계 벌점 관리:</strong> 최근 1년 이내의 누계 벌점이 15점 이상이 될 시 상장규정에 의한 관리종목 지정 대상이 됩니다.</li>
+                            <li><strong>대체부과 기회:</strong> 부과 벌점이 5점 미만이며 고의성이 없을 경우 제재금으로 벌점대체 신청이 가능합니다(1점당 400만 원, 제13조의3).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Guidelines summary -->
+        <div id="tabContent_guide" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">KOSPI 공시 실무 핵심 조항 해설</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+                
+                <!-- Rule A -->
+                <div class="p-4 rounded-xl border border-slate-100 bg-slate-50">
+                    <h4 class="font-bold text-krx-blue mb-2 flex items-center gap-1">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        대규모법인 기준 (규정 제2조 제13항)
+                    </h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        최근 사업연도말 자산총액이 <strong>2조원 이상</strong>인 상장법인은 법상 '대규모법인'으로 자동 분류됩니다. 
+                        자산 양수도, 매출처 변경, 영업정지 등의 공시판단 비율이 일반 기업의 100분의 5(5%)에서 1000분의 25(2.5%) 등으로 대폭 하향 조정되므로 법무 및 재무 파트의 각별한 상시 모니터링이 필요합니다.
+                    </p>
+                </div>
+
+                <!-- Rule B -->
+                <div class="p-4 rounded-xl border border-slate-100 bg-slate-50">
+                    <h4 class="font-bold text-krx-blue mb-2 flex items-center gap-1">
+                        <i data-lucide="clock" class="w-4 h-4"></i>
+                        공시 시한 기준 (제25조, 세칙 제25조)
+                    </h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        주요경영사항은 원칙적으로 <strong>사유 발생 당일</strong> 신고하여야 합니다. 
+                        단, 단일판매 및 공급계약(제1호 다목) 등 일부 익일공시 사항은 다음 날까지 신고할 수 있습니다. 당일 및 익일 공시 시한 종료 시간은 역에 의하지 않은 매매거래일 기준 <strong>오후 6시(18시)</strong>로 규정되어 있습니다.
+                    </p>
+                </div>
+
+                <!-- Rule C -->
+                <div class="p-4 rounded-xl border border-slate-100 bg-slate-50">
+                    <h4 class="font-bold text-krx-blue mb-2 flex items-center gap-1">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                        신청에 의한 공시유보 (제43조의2)
+                    </h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        경영상 비밀 유지가 긴밀히 필요한 사항(예: 특수 연구과제 연계 신규시설투자 또는 계약상대의 영업비밀 보호 요청 계약 등)에 한해 거래소 사전 승인을 통해 한시적 <strong>공시 유보</strong> 신청을 진행할 수 있습니다. 유보 기간 중 비밀 유지 엄수는 필수입니다.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tab 3: AI Simulator QA Helper -->
+        <div id="tabContent_qa" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+            <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
+                <i data-lucide="message-square" class="w-5 h-5 text-krx-blue"></i>
+                실무 다빈출 공시 헬퍼 (FAQ 및 대화형 시뮬레이터)
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                
+                <!-- Q1 -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-900 flex items-center gap-1.5 mb-1 text-xs">
+                        <span class="bg-krx-blue text-white px-2 py-0.5 rounded text-[10px]">질문</span>
+                        자기자본이 완전 자본잠식 상태인 경우, 자기자본 기준 공시는 어떻게 산출하나요?
+                    </p>
+                    <p class="text-xs text-slate-600 leading-relaxed pl-1">
+                        <strong>답변:</strong> 공시규정 제3조 제5항에 의거하여, 신고사유 발생시점 기준으로 자기자본이 자본금 미만인 법인의 경우에는 <strong>자본금액</strong>을 자기자본으로 보아 규정을 적용합니다. 본 검토기에서도 자본금을 초과하는 상태의 실질 자기자본을 자동 대조 적용합니다.
+                    </p>
+                </div>
+
+                <!-- Q2 -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-900 flex items-center gap-1.5 mb-1 text-xs">
+                        <span class="bg-krx-blue text-white px-2 py-0.5 rounded text-[10px]">질문</span>
+                        공동 계약을 체결한 경우, 공시 대상 비율 산출을 위한 금액은 어떻게 되나요?
+                    </p>
+                    <p class="text-xs text-slate-600 leading-relaxed pl-1">
+                        <strong>답변:</strong> 공동 계약의 경우 계약 총액이 아닌 **해당 기업이 직접 보증, 배정받은 지분 금액(자기 보유 지분액)**을 기준으로 산출하여 검토 대상 금액에 입력해야 합니다.
+                    </p>
+                </div>
+
+                <!-- Q3 -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-900 flex items-center gap-1.5 mb-1 text-xs">
+                        <span class="bg-krx-blue text-white px-2 py-0.5 rounded text-[10px]">질문</span>
+                        공시 의무 비율에 소폭 미달하여 의무 공시가 아닌 경우, 자율공시가 가능한가요?
+                    </p>
+                    <p class="text-xs text-slate-600 leading-relaxed pl-1">
+                        <strong>답변:</strong> 네, 가능합니다. 규정 제28조(자율공시) 및 시행세칙 제8조 제20호에 따라 의무 공시 비율에 미달하더라도 투자판단에 중요하다고 간주되는 사건의 경우 사유발생 다음 날까지 자율적으로 거래소에 신고 및 공시를 진행할 수 있습니다.
+                    </p>
+                </div>
+
+                <!-- Q4 -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <p class="font-bold text-slate-900 flex items-center gap-1.5 mb-1 text-xs">
+                        <span class="bg-krx-blue text-white px-2 py-0.5 rounded text-[10px]">질문</span>
+                        공시를 예정대로 완료했는데 계약 내용이 일부 소폭 변동되었습니다. 다시 정정공시해야 하나요?
+                    </p>
+                    <p class="text-xs text-slate-600 leading-relaxed pl-1">
+                        <strong>답변:</strong> 시행세칙 제18조의3에 의거하여, 최초 공시 대비 계약금액이 10% 이내에서 가감 변경되거나 계약 시작/종료일이 20일(장기 계약인 경우 3개월) 이내로 경미하게 바뀔 때는 공시 변경에 해당하지 않아 의무 변경 대상에서 예외 처리될 수 있습니다.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Global Footer -->
+    <footer class="bg-krx-navy text-slate-400 text-xs py-6 border-t border-slate-800 text-center no-print">
+        <p>© 2026 KRX KOSPI Disclosure Self-Review Simulator System. All Rights Reserved.</p>
+        <p class="mt-1 text-[10px] text-slate-600">본 시스템은 한국거래소 유가증권시장 공시규정 및 관련 시행세칙의 법문을 가이드화한 자체 검토 도구로써 법적 구속력이 없으므로 반드시 전문가 심사를 수반하십시오.</p>
+    </footer>
+
+    <!-- Core Interactive Application Engine (Pure JS) -->
+    <script>
+        // Data Store containing disclosure items
+        const DISCLOSURE_ITEMS = {
+            sales_contract: {
+                id: 'sales_contract',
+                category: '영업 및 생산활동',
+                title: '단일판매계약 또는 공급계약 체결 및 해지',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제1호 다목',
+                baseType: '매출액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '익일',
+                deadlineDesc: '사유발생일 다음 날 18시까지 신고',
+                inputLabel: '계약 금액 (해당 지분액)',
+                desc: '단일판매계약 또는 공급계약을 체결하거나 계약을 해지한 때 공시 의무가 발생합니다.'
+            },
+            business_halt: {
+                id: 'business_halt',
+                category: '영업 및 생산활동',
+                title: '영업 또는 주된 영업의 일부/전부 정지',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제1호 가목',
+                baseType: '매출액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고 (정지결정 또는 처분 통지 시)',
+                inputLabel: '정지 대상 영업 부문 매출액',
+                desc: '주요 영업의 일부 또는 전부가 정지(행정처분 포함)되거나 이를 이사회에서 결의한 때 적용됩니다.'
+            },
+            customer_stop: {
+                id: 'customer_stop',
+                category: '영업 및 생산활동',
+                title: '주요 거래처와의 거래 중단',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제1호 나목',
+                baseType: '매출액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '중단 대상 거래처에 대한 최근 연간 매출액',
+                desc: '최근 사업연도 매출총액 중 중단된 주요 매출 거래처와의 거래 규모를 기준으로 합니다.'
+            },
+            product_recall: {
+                id: 'product_recall',
+                category: '영업 및 생산활동',
+                title: '제품 수거 및 파기 결정',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제1호 라목',
+                baseType: '매출액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '해당 품목 매출액 또는 수거/파기 소요 예상액',
+                desc: '제품의 안전 문제 등으로 수거 및 파기 등 중대 조치를 결정한 때 공시 의무가 발생합니다.'
+            },
+            factory_stop: {
+                id: 'factory_stop',
+                category: '영업 및 생산활동',
+                title: '공장 생산활동 중단 또는 폐업',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제1호 마목',
+                baseType: '매출액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '해당 공장 최근 매출 생산액',
+                desc: '주요 생산 공장의 중단, 가동 불능 또는 폐업 발생 시 판단 기준이 됩니다.'
+            },
+            asset_deal: {
+                id: 'asset_deal',
+                category: '투자 및 자산 활동',
+                title: '유형자산의 취득 및 처분 결정',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 나목(2)',
+                baseType: '자산총액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고 (이사회 결의 또는 취득 계약일 중 빠른 날)',
+                inputLabel: '유형자산 거래/처분 금액',
+                desc: '임대용 부동산을 포함한 고정자산의 양수/양도액 및 사모 투자기구 자산 등의 금액 기준입니다.'
+            },
+            equity_investment: {
+                id: 'equity_investment',
+                category: '투자 및 자산 활동',
+                title: '타법인 출자(주식 취득) 및 처분 결정',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 나목(3)',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '출자 인수액 또는 처분 결정액',
+                desc: '지배지분이나 투자 목적으로 타사의 발행 주식을 대량 취득·매각하기로 이사회 결의한 경우입니다.'
+            },
+            facility_investment: {
+                id: 'facility_investment',
+                category: '투자 및 자산 활동',
+                title: '신규시설투자 및 시설증설 결정',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 나목(1)',
+                baseType: '자기자본',
+                ratioGeneral: 0.10,
+                ratioLarge: 0.05,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '신규 설비 및 시설 투자금액',
+                desc: '공장 증설, 연구시설 신설, 또는 무형자산성 콘텐츠(게임/음반) 시설외투자를 포괄합니다.'
+            },
+            bond_deal: {
+                id: 'bond_deal',
+                category: '투자 및 자산 활동',
+                title: '주권 관련 사채권의 취득 또는 처분',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 나목(3)',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '사채권 거래/양수 가액',
+                desc: '전환사채(CB), 신주인수권부사채(BW), 교환사채(EB) 등을 취득하거나 처분하기로 결의할 때입니다.'
+            },
+            short_loan: {
+                id: 'short_loan',
+                category: '채무 및 재무 구조',
+                title: '단기차입금 증가 결정',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 다목(1)',
+                baseType: '자기자본',
+                ratioGeneral: 0.10,
+                ratioLarge: 0.05,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '증가되는 차입금 규모',
+                desc: '기존 채무 대환 목적 차입을 제외한 순수 만기 1년 이내의 신규 자금 대출 및 단기회사채 포함입니다.'
+            },
+            debt_guarantee: {
+                id: 'debt_guarantee',
+                category: '채무 및 재무 구조',
+                title: '타인을 위한 담보제공 및 채무보증',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 다목(3)',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '담보 제공 한도액 또는 보증액',
+                desc: '일반적인 영업 활동상 하자보증, 납세보증 등을 제외한 타 법인을 위해 채무 보증하는 건을 지칭합니다.'
+            },
+            debt_assume_forgive: {
+                id: 'debt_assume_forgive',
+                category: '채무 및 재무 구조',
+                title: '채무인수 및 채무면제 결정',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 다목(2)',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '양수받거나 탕감받은 채무 금액',
+                desc: '타방의 채무 부채를 떠안거나 거래처 등으로부터 채무를 감면받아 이익이 확인되는 가액입니다.'
+            },
+            prepayment_loan: {
+                id: 'prepayment_loan',
+                category: '채무 및 재무 구조',
+                title: '선급금 지급, 가지급, 금전대여 및 증권 대여',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 다목(7)',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생일 당일 18시까지 신고',
+                inputLabel: '대여 또는 가/선급하는 금원',
+                desc: '타사에 대한 자금 대여, 대규모 가지급금 배정 및 자산 대여 등 자금 유출 건에 대한 판단 기준입니다.'
+            },
+            disaster_loss: {
+                id: 'disaster_loss',
+                category: '손실 및 재해',
+                title: '재해 발생 (화재, 천재지변 등)',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 라목(1)',
+                baseType: '자산총액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생 사실 확인 즉시 신고',
+                inputLabel: '재해 예상 피해가액',
+                desc: '화재, 수해, 천재지변 등의 사고로 인하여 주요 자산의 소실이 인지되었을 때입니다.'
+            },
+            penalty_fine: {
+                id: 'penalty_fine',
+                category: '손실 및 재해',
+                title: '벌금, 과태료, 추징금, 과징금 부과 확인',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 라목(2)',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '부과 처분 통지 도달 당일 18시까지 신고',
+                inputLabel: '고지된 부과금 및 추징총액',
+                desc: '공정위, 금융위 등 규제 행정기관 또는 사법기관으로부터 거액의 과징금/추징 벌금을 통지받은 경우입니다.'
+            },
+            deriv_loss: {
+                id: 'deriv_loss',
+                category: '손실 및 재해',
+                title: '파생상품 거래 손실 발생',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 라목(4)',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '당일',
+                deadlineDesc: '사유발생 사실 확인 당일 18시까지 신고',
+                inputLabel: '당해 사업연도 파생 누계 손실 규모',
+                desc: '위험 회피용 적격 거래를 배제한 순수 옵션/선물 파생 거래 등에서 발생한 실질/미실현 누적 평가손입니다.'
+            },
+            impairment_loss: {
+                id: 'impairment_loss',
+                category: '손실 및 재해',
+                title: '매출채권 외 채권의 손상차손 발생',
+                regulation: '유가증권시장 공시규정 제7조 제1항 제2호 라목(6)',
+                baseType: '자기자본',
+                ratioGeneral: 0.50,
+                ratioLarge: 0.25,
+                deadlineType: '당일',
+                deadlineDesc: '사실 확인 당일 18시까지 신고',
+                inputLabel: '누계 차손액 규모',
+                desc: '일반 매출 채권을 제외한 단장기 대여금 등의 대손 충당 및 대손 처리 확정 시의 심사 기준선입니다.'
+            }
+        };
+
+        // Current App State
+        let currentUnit = 'won'; // 'won' (base KRW) or 'eok' (100 million KRW)
+        let activeCategoryFilter = 'all';
+        let selectedItemId = null;
+        
+        let financialData = {
+            Asset: 0,
+            Revenue: 0,
+            Equity: 0,
+            PaidCapital: 0
+        };
+        let eventAmount = 0;
+
+        // On Page Load
+        window.onload = function() {
+            lucide.createIcons();
+            renderDisclosureList();
+            setInitialState();
+            calculatePenaltyEstimate();
+        };
+
+        // Switch Unit of Input
+        function setUnit(unit) {
+            currentUnit = unit;
+            
+            // Adjust buttons active classes
+            const wonBtn = document.getElementById('unitBtnWon');
+            const eokBtn = document.getElementById('unitBtnEok');
+            if (unit === 'won') {
+                wonBtn.className = "px-3 py-1 rounded text-xs font-semibold transition bg-white text-slate-800 shadow-sm";
+                eokBtn.className = "px-3 py-1 rounded text-xs font-semibold transition text-slate-500 hover:text-slate-800";
+                
+                // Update text indicators
+                document.getElementById('unitLabelAsset').innerText = '원';
+                document.getElementById('unitLabelRevenue').innerText = '원';
+                document.getElementById('unitLabelEquity').innerText = '원';
+                document.getElementById('unitLabelPaidCapital').innerText = '원';
+                document.getElementById('unitLabelEvent').innerText = '원';
+            } else {
+                wonBtn.className = "px-3 py-1 rounded text-xs font-semibold transition text-slate-500 hover:text-slate-800";
+                eokBtn.className = "px-3 py-1 rounded text-xs font-semibold transition bg-white text-slate-800 shadow-sm";
+                
+                document.getElementById('unitLabelAsset').innerText = '억 원';
+                document.getElementById('unitLabelRevenue').innerText = '억 원';
+                document.getElementById('unitLabelEquity').innerText = '억 원';
+                document.getElementById('unitLabelPaidCapital').innerText = '억 원';
+                document.getElementById('unitLabelEvent').innerText = '억 원';
+            }
+
+            // Repopulate Inputs to reflect conversion
+            updateInputFieldsToUnit();
+            updateLabelDisplays();
+            evaluateDisclosureCompliance();
+        }
+
+        // Adjust raw inputs to represent Eok or Won based on toggle
+        function updateInputFieldsToUnit() {
+            const keys = ['Asset', 'Revenue', 'Equity', 'PaidCapital'];
+            keys.forEach(key => {
+                const element = document.getElementById(`input` + key);
+                if (financialData[key] > 0) {
+                    element.value = getDisplayValue(financialData[key]);
+                } else {
+                    element.value = '';
+                }
+            });
+
+            const evInput = document.getElementById('inputEventAmount');
+            if (eventAmount > 0) {
+                evInput.value = getDisplayValue(eventAmount);
+            } else {
+                evInput.value = '';
+            }
+        }
+
+        // Helper to scale raw value to view value
+        function getDisplayValue(rawValue) {
+            if (currentUnit === 'eok') {
+                return (rawValue / 100000000).toString();
+            }
+            return rawValue.toLocaleString();
+        }
+
+        // Handle numeric inputs for financial metrics
+        function handleFinancialInput(metricKey, rawStr) {
+            let numericValue = parseInputValue(rawStr);
+            financialData[metricKey] = numericValue;
+            
+            // Auto update display strings
+            updateLabelDisplays();
+            evaluateDisclosureCompliance();
+        }
+
+        // Handle transaction event amount input
+        function handleEventAmountInput(rawStr) {
+            let numericValue = parseInputValue(rawStr);
+            eventAmount = numericValue;
+            
+            updateLabelDisplays();
+            evaluateDisclosureCompliance();
+        }
+
+        // Parse user input strings with comma or decimal
+        function parseInputValue(str) {
+            let clean = str.replace(/[^0-9.]/g, '');
+            let val = parseFloat(clean);
+            if (isNaN(val) || val <= 0) return 0;
+
+            if (currentUnit === 'eok') {
+                return val * 100000000; // Scale 1 Eok to 100,000,000 Won
+            }
+            return val;
+        }
+
+        // Quick incremental value adder buttons
+        function addFinancialValue(metricKey, eokDelta) {
+            let delta = eokDelta * 100000000;
+            financialData[metricKey] += delta;
+
+            const inputEl = document.getElementById(`input` + metricKey);
+            inputEl.value = getDisplayValue(financialData[metricKey]);
+
+            updateLabelDisplays();
+            evaluateDisclosureCompliance();
+        }
+
+        // Quick incremental value for Event amount
+        function addEventValue(eokDelta) {
+            let delta = eokDelta * 100000000;
+            eventAmount += delta;
+
+            const inputEl = document.getElementById('inputEventAmount');
+            inputEl.value = getDisplayValue(eventAmount);
+
+            updateLabelDisplays();
+            evaluateDisclosureCompliance();
+        }
+
+        // Translate financial baseline raw numbers to detailed Korean Words
+        function updateLabelDisplays() {
+            document.getElementById('labelAssetKrw').innerText = formatKoreanWord(financialData.Asset);
+            document.getElementById('labelRevenueKrw').innerText = formatKoreanWord(financialData.Revenue);
+            document.getElementById('labelEquityKrw').innerText = formatKoreanWord(financialData.Equity);
+            document.getElementById('labelPaidCapitalKrw').innerText = formatKoreanWord(financialData.PaidCapital);
+            document.getElementById('labelEventAmountKrw').innerText = formatKoreanWord(eventAmount);
+
+            // Paid-in Capital adjustment rule (Article 3, Paragraph 5)
+            const adjustBanner = document.getElementById('adjustedEquityBanner');
+            if (financialData.Equity > 0 && financialData.PaidCapital > 0 && financialData.Equity < financialData.PaidCapital) {
+                adjustBanner.classList.remove('hidden');
+                document.getElementById('adjustedEquityVal').innerText = formatKoreanWord(financialData.PaidCapital);
+            } else {
+                adjustBanner.classList.add('hidden');
+            }
+        }
+
+        // Korean Word Converter (e.g., 2500000000000 -> 2조 5,000억 원)
+        function formatKoreanWord(value) {
+            if (!value || isNaN(value) || value <= 0) return '0원';
+            
+            const units = ['', '만', '억', '조', '경'];
+            let result = [];
+            let temp = Math.floor(value);
+            
+            let unitIdx = 0;
+            while (temp > 0) {
+                let rem = temp % 10000;
+                if (rem > 0) {
+                    result.unshift(`${rem.toLocaleString()}${units[unitIdx]}`);
+                }
+                temp = Math.floor(temp / 10000);
+                unitIdx++;
+            }
+            
+            return result.join(' ') + ' 원';
+        }
+
+        // Render dynamic searchable disclosure list
+        function renderDisclosureList() {
+            const container = document.getElementById('disclosureItemsContainer');
+            container.innerHTML = '';
+
+            const searchQuery = document.getElementById('disclosureSearch').value.toLowerCase();
+
+            Object.values(DISCLOSURE_ITEMS).forEach(item => {
+                // Filters
+                const matchesSearch = item.title.toLowerCase().includes(searchQuery) || 
+                                      item.desc.toLowerCase().includes(searchQuery) || 
+                                      item.category.toLowerCase().includes(searchQuery);
+                const matchesCategory = activeCategoryFilter === 'all' || item.category === activeCategoryFilter;
+
+                if (matchesSearch && matchesCategory) {
+                    const itemCard = document.createElement('div');
+                    const isActive = selectedItemId === item.id;
+                    itemCard.className = `p-3 rounded-xl border text-xs cursor-pointer transition-all duration-200 flex justify-between items-center ${
+                        isActive ? 'bg-krx-blue/10 border-krx-blue ring-2 ring-krx-blue/20 font-semibold' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                    }`;
+                    itemCard.onclick = () => selectDisclosureItem(item.id);
+
+                    itemCard.innerHTML = `
+                        <div class="space-y-0.5">
+                            <span class="text-[9px] text-slate-400 font-bold tracking-widest uppercase">${item.category}</span>
+                            <h4 class="font-bold text-slate-800">${item.title}</h4>
+                            <p class="text-[10px] text-slate-500 overflow-hidden text-ellipsis whitespace-nowrap max-w-[280px]">${item.desc}</p>
+                        </div>
+                        <i data-lucide="${isActive ? 'check-circle-2' : 'chevron-right'}" class="w-4 h-4 text-krx-blue flex-shrink-0"></i>
+                    `;
+                    container.appendChild(itemCard);
+                }
+            });
+
+            lucide.createIcons();
+        }
+
+        // Filter chips triggers
+        function filterCategory(category) {
+            activeCategoryFilter = category;
+            
+            // Adjust buttons classes
+            const chips = ['all', '영업 및 생산활동', '투자 및 자산 활동', '채무 및 재무 구조', '손실 및 재해'];
+            const names = ['all', '영업', '투자', '채무', '손실'];
+            
+            chips.forEach((c, idx) => {
+                const btn = document.getElementById(`catBtn_` + names[idx]);
+                if (c === category) {
+                    btn.className = "text-xs bg-krx-blue text-white font-semibold px-3 py-1 rounded-full transition shadow-sm";
+                } else {
+                    btn.className = "text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition";
+                }
+            });
+
+            renderDisclosureList();
+        }
+
+        // Filter trigger on typing search
+        function filterDisclosureItems() {
+            renderDisclosureList();
+        }
+
+        // Set Initial state views
+        function setInitialState() {
+            document.getElementById('resultInitialState').classList.remove('hidden');
+            document.getElementById('resultAnalysisArea').classList.add('hidden');
+            document.getElementById('printReportArea').classList.add('hidden');
+        }
+
+        // User selects a specific item card
+        function selectDisclosureItem(id) {
+            selectedItemId = id;
+            renderDisclosureList();
+
+            // Enable event value input widget
+            const eventWidget = document.getElementById('eventAmountWidget');
+            eventWidget.classList.remove('opacity-50', 'pointer-events-none');
+
+            // Set input label dynamically
+            const item = DISCLOSURE_ITEMS[id];
+            document.getElementById('eventAmountLabel').innerText = `${item.inputLabel} (기준: ${item.baseType})`;
+
+            evaluateDisclosureCompliance();
+        }
+
+        // Evaluates compliance rules dynamically
+        function evaluateDisclosureCompliance() {
+            if (!selectedItemId) {
+                setInitialState();
+                return;
+            }
+
+            const item = DISCLOSURE_ITEMS[selectedItemId];
+            
+            // Show result display areas
+            document.getElementById('resultInitialState').classList.add('hidden');
+            document.getElementById('resultAnalysisArea').classList.remove('hidden');
+            document.getElementById('printReportArea').classList.remove('hidden');
+
+            // 1. Determine Company Classification (Large vs General)
+            const isLargeCorp = financialData.Asset >= 2000000000000; // 2 Trillion Won threshold
+            const badge = document.getElementById('corpBadge');
+            
+            if (isLargeCorp) {
+                badge.innerHTML = `<i data-lucide="award" class="w-3.5 h-3.5 mr-1 text-amber-600"></i> 대규모법인 (자산 2조↑)`;
+                badge.className = "inline-flex items-center bg-amber-50 text-amber-800 text-xs font-bold px-3 py-1 rounded-full border border-amber-200 shadow-sm whitespace-nowrap";
+            } else {
+                badge.innerHTML = `<i data-lucide="award" class="w-3.5 h-3.5 mr-1 text-slate-600"></i> 일반 KOSPI 상장법인`;
+                badge.className = "inline-flex items-center bg-slate-50 text-slate-700 text-xs font-bold px-3 py-1 rounded-full border border-slate-200 shadow-sm whitespace-nowrap";
+            }
+
+            // 2. Adjust Equity baseline if capital adjustment rule applies
+            let baseEquity = financialData.Equity;
+            if (financialData.PaidCapital > 0 && financialData.Equity < financialData.PaidCapital) {
+                baseEquity = financialData.PaidCapital; // Use paid-in capital instead of negative or minor equity
+            }
+
+            // 3. Resolve base parameter value for calculations
+            let baseParamValue = 0;
+            if (item.baseType === '매출액') baseParamValue = financialData.Revenue;
+            else if (item.baseType === '자산총액') baseParamValue = financialData.Asset;
+            else if (item.baseType === '자기자본') baseParamValue = baseEquity;
+
+            // 4. Compute regulatory triggers and thresholds
+            const appliedRatio = isLargeCorp ? item.ratioLarge : item.ratioGeneral;
+            const minimumTriggerValue = baseParamValue * appliedRatio;
+
+            // Check if triggers are zero (means base parameter hasn't been input)
+            const isBaseDataMissing = baseParamValue <= 0;
+
+            // Check compliance obligation
+            const isObligated = eventAmount >= minimumTriggerValue && !isBaseDataMissing && eventAmount > 0;
+
+            // Fill Analysis Area Data
+            document.getElementById('selectedDisclosureTitle').innerText = item.title;
+            document.getElementById('selectedDisclosureCategory').innerText = `${item.category} • ${item.regulation}`;
+
+            document.getElementById('calcBaseType').innerText = item.baseType;
+            document.getElementById('calcBaseValue').innerText = formatKoreanWord(baseParamValue);
+            document.getElementById('calcRequiredRatio').innerText = `${(appliedRatio * 100).toFixed(1)}%`;
+            document.getElementById('calcMinTriggerAmount').innerText = isBaseDataMissing ? '기초자료 누락' : formatKoreanWord(minimumTriggerValue);
+            document.getElementById('calcActualValue').innerText = formatKoreanWord(eventAmount);
+
+            // Progress Circular Meter update
+            let reachPercentage = 0;
+            if (minimumTriggerValue > 0) {
+                reachPercentage = Math.round((eventAmount / minimumTriggerValue) * 100);
+            }
+            
+            // Limit progress to visual max 100% but keep textual percentage precise
+            let circleVal = Math.min(reachPercentage, 100);
+            const dashoffset = 314.16 - (314.16 * circleVal) / 100;
+            const progressCircle = document.getElementById('gaugeProgressCircle');
+            progressCircle.style.strokeDashoffset = dashoffset;
+            document.getElementById('gaugePercentage').innerText = `${reachPercentage}%`;
+
+            // Adjust Meter Colors
+            if (reachPercentage >= 100) {
+                progressCircle.setAttribute('stroke', '#C0392B'); // Danger Red
+                document.getElementById('gaugeStatusText').innerText = "의무 발생 (초과)";
+                document.getElementById('gaugeStatusText').className = "text-xs font-bold mt-2 text-rose-600 animate-pulse";
+            } else if (reachPercentage >= 80) {
+                progressCircle.setAttribute('stroke', '#F39C12'); // Amber Warnings
+                document.getElementById('gaugeStatusText').innerText = "주의 (도달 임박)";
+                document.getElementById('gaugeStatusText').className = "text-xs font-bold mt-2 text-amber-500";
+            } else {
+                progressCircle.setAttribute('stroke', '#114E9E'); // Normal Blue
+                document.getElementById('gaugeStatusText').innerText = "안정 권역";
+                document.getElementById('gaugeStatusText').className = "text-xs font-bold mt-2 text-slate-500";
+            }
+
+            // Diagnostic Banner Injections
+            const verdictBanner = document.getElementById('verdictBanner');
+            const verdictIconBox = document.getElementById('verdictIconBox');
+            const verdictHeadline = document.getElementById('verdictHeadline');
+            const verdictMessage = document.getElementById('verdictMessage');
+            const pulseBg = document.getElementById('resultPulseBg');
+
+            if (isBaseDataMissing) {
+                verdictBanner.className = "p-5 rounded-2xl flex items-start gap-4 transition-all duration-300 bg-slate-100 border border-slate-200 text-slate-700";
+                verdictIconBox.className = "p-3 rounded-xl bg-slate-200 text-slate-600";
+                verdictIconBox.innerHTML = `<i data-lucide="info" class="w-6 h-6"></i>`;
+                verdictHeadline.innerText = "기초 재무정보 확인 필요";
+                verdictMessage.innerText = `판단 기준이 되는 회사 재무 정보(${item.baseType})가 공란이거나 0원입니다. 왼쪽 상단 폼에 재무 기초 수치를 기재해 주십시오.`;
+                pulseBg.className = "absolute inset-0 bg-slate-50 transition-colors duration-500 -z-10";
+            } else if (eventAmount <= 0) {
+                verdictBanner.className = "p-5 rounded-2xl flex items-start gap-4 transition-all duration-300 bg-slate-100 border border-slate-200 text-slate-700";
+                verdictIconBox.className = "p-3 rounded-xl bg-slate-200 text-slate-600";
+                verdictIconBox.innerHTML = `<i data-lucide="info" class="w-6 h-6"></i>`;
+                verdictHeadline.innerText = "발생 거래 금액 입력 대기";
+                verdictMessage.innerText = "왼쪽 하단에 검토 대상 사건/거래 금액을 기재해 주시면, 법정 기준선과 비교 분석이 실행됩니다.";
+                pulseBg.className = "absolute inset-0 bg-slate-50 transition-colors duration-500 -z-10";
+            } else if (isObligated) {
+                verdictBanner.className = "p-5 rounded-2xl flex items-start gap-4 transition-all duration-300 bg-rose-50 border border-rose-200 text-rose-900";
+                verdictIconBox.className = "p-3 rounded-xl bg-rose-500 text-white";
+                verdictIconBox.innerHTML = `<i data-lucide="alert-octagon" class="w-6 h-6 animate-ping"></i>`;
+                verdictHeadline.innerText = "⚠️ 주요경영사항 의무 공시 대상";
+                verdictMessage.innerText = `거래 금액(${formatKoreanWord(eventAmount)})이 법정 공시 기준선(${formatKoreanWord(minimumTriggerValue)})을 초과하였습니다. 즉각적인 공시 준비 및 이사회 의결 확인이 권고됩니다.`;
+                pulseBg.className = "absolute inset-0 bg-rose-50/50 transition-colors duration-500 -z-10";
+            } else {
+                verdictBanner.className = "p-5 rounded-2xl flex items-start gap-4 transition-all duration-300 bg-emerald-50 border border-emerald-200 text-emerald-950";
+                verdictIconBox.className = "p-3 rounded-xl bg-emerald-500 text-white";
+                verdictIconBox.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i>`;
+                verdictHeadline.innerText = "의무 공시 미해당 (공시의무 없음)";
+                verdictMessage.innerText = `거래 금액이 기준선 미만입니다. 법적 공시 의무는 없으나, 투자 판단에 중대한 영향을 준다고 자체 판단될 시 자율공시(규정 제28조) 여부를 실무 검토할 수 있습니다.`;
+                pulseBg.className = "absolute inset-0 bg-emerald-50/30 transition-colors duration-500 -z-10";
+            }
+
+            // Accordion Text mapping
+            document.getElementById('ruleCitation').innerText = `${item.regulation}`;
+            document.getElementById('ruleDeadline').innerText = `${item.deadlineDesc}`;
+            
+            // Generate list items for guidance
+            const rulePreps = document.getElementById('rulePreps');
+            rulePreps.innerHTML = `
+                <li><strong>보고 의무 시한:</strong> ${item.deadlineDesc}</li>
+                <li><strong>필요 증빙자료:</strong> 당해 행위를 결의한 이사회의사록 또는 관련 가계약서 및 실행 계약문서 원본 확보 필요.</li>
+                <li><strong>이사회 공시 정보:</strong> 신고 작성 시 '사외이사의 이사회 참석 여부(참석/불참 수)'를 공시란에 명시 필수 (규정 제46조).</li>
+                <li><strong>정정 의무 한계:</strong> 공시 진행 후 주요 가액의 50% 이상(주식 배정의 경우 20% 이상)의 규모 변동이 발생할 시 '공시 변경' 리스크가 있으므로 주의할 것 (규정 제31조).</li>
+            `;
+
+            // Update printable report data
+            updatePrintableReport(item, isLargeCorp, isObligated, minimumTriggerValue, appliedRatio, baseParamValue);
+            lucide.createIcons();
+        }
+
+        // Fill data for the printable PDF card
+        function updatePrintableReport(item, isLargeCorp, isObligated, triggerVal, ratio, baseVal) {
+            document.getElementById('printCorpScale').innerText = isLargeCorp ? '대규모법인 (자산 2조 원 이상)' : '일반 유가증권 상장법인';
+            document.getElementById('printVerdictStatus').innerText = isObligated ? '의무 대상' : '의무 면제';
+            
+            document.getElementById('printAsset').innerText = formatKoreanWord(financialData.Asset);
+            document.getElementById('printRevenue').innerText = formatKoreanWord(financialData.Revenue);
+            document.getElementById('printEquity').innerText = formatKoreanWord(financialData.Equity);
+            document.getElementById('printPaidCapital').innerText = formatKoreanWord(financialData.PaidCapital);
+
+            document.getElementById('printDisclosureTitle').innerText = item.title;
+            document.getElementById('printRuleCitation').innerText = item.regulation;
+            document.getElementById('printActualValue').innerText = formatKoreanWord(eventAmount);
+            document.getElementById('printTriggerValue').innerText = `${formatKoreanWord(triggerVal)} (${item.baseType}의 ${(ratio * 100).toFixed(1)}%)`;
+            document.getElementById('printDeadline').innerText = item.deadlineDesc;
+
+            const verdictResult = document.getElementById('printVerdictResult');
+            const opinionBox = document.getElementById('printOpinion');
+
+            if (isObligated) {
+                verdictResult.innerText = "★ 법정 공시 의무 대상 (의무 발생)";
+                verdictResult.style.color = '#C0392B';
+                opinionBox.innerHTML = `
+                    <p>위 상장법인의 <strong>${item.title}</strong> 자가 실무 심사 결과, 검토 대상 거래 금액(${formatKoreanWord(eventAmount)})이 법정 기준선인 <strong>${formatKoreanWord(triggerVal)}</strong>을 초과하여 공시규정 제7조 제1항에 의거한 <strong>주요경영사항 의무 공시 대상으로 판정</strong>됩니다.</p>
+                    <p class="mt-2">실무팀은 이사회 결의 및 계약 체결 등 의결 요건 성립 시점으로부터 <strong>${item.deadlineDesc}</strong> 이내에 한국거래소 전자공시시스템(KIND)을 통한 의무 신고 절차를 지체 없이 속개하여 주시기 바랍니다. 공시 기재 오류 및 누락 시 불성실공시 지정 등의 불이익이 발생할 수 있으므로, 최종 문안 제출 전 사외이사 참석 현황 등 검증 필수 조치를 권고합니다.</p>
+                `;
+            } else {
+                verdictResult.innerText = "공시 의무 미해당 (자율 검토 대상)";
+                verdictResult.style.color = '#27AE60';
+                opinionBox.innerHTML = `
+                    <p>위 상장법인의 <strong>${item.title}</strong> 자가 실무 심사 결과, 검토 대상 거래 가액이 규정상 trigger 임계치에 도달하지 아니하여 <strong>법적 강제 공시 의무는 발생하지 않는 것으로 판정</strong>됩니다.</p>
+                    <p class="mt-2">다만, 공시의무는 면제되나 당해 사건이 향후 투자자의 판단 영역 및 주가 변동성에 지대한 파급효과가 예상된다고 이사회 등에서 판단할 시, 규정 제28조 및 시행세칙 제8조 제20호에 맞춰 <strong>'자율공시'</strong>를 통한 정보 투명성 제고 방안을 적극 검토할 수 있습니다.</p>
+                `;
+            }
+        }
+
+        // Sub Feature Tab Selector
+        function switchTab(tabId) {
+            const tabs = ['penalty', 'guide', 'qa'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tabBtn_` + t);
+                const content = document.getElementById(`tabContent_` + t);
+                
+                if (t === tabId) {
+                    btn.className = "border-b-2 border-krx-blue text-krx-blue px-1 pb-4 text-sm font-bold flex items-center gap-2";
+                    content.classList.remove('hidden');
+                } else {
+                    btn.className = "border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 px-1 pb-4 text-sm font-semibold flex items-center gap-2";
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // Estimates Risk points & fines based on Motive & Severity
+        function calculatePenaltyEstimate() {
+            const motive = document.getElementById('penaltyMotive').value;
+            const importance = document.getElementById('penaltyImportance').value;
+
+            let basePoints = 0;
+            let rangeDetails = "";
+            let additionalFine = "0원";
+
+            // Mapping approximate points matrix based on [별표 2]
+            if (motive === 'simple') {
+                if (importance === 'minor') {
+                    basePoints = 2;
+                    rangeDetails = "통상적인 기재 오류 및 단기 지연 (경감 가능)";
+                } else if (importance === 'moderate') {
+                    basePoints = 4;
+                    rangeDetails = "통상의 과실에 의한 주요 공시 누락";
+                } else {
+                    basePoints = 6;
+                    rangeDetails = "과실이나 위반 영향이 비교적 큰 중요 사항 누락";
+                }
+            } else if (motive === 'gross') {
+                if (importance === 'minor') {
+                    basePoints = 4;
+                    rangeDetails = "공시 인지 미비 등 부서 협조 부족에 따른 누락";
+                } else if (importance === 'moderate') {
+                    basePoints = 7;
+                    rangeDetails = "중과실로 인한 주요경영 결정 사항 공시 장기 지연";
+                } else {
+                    basePoints = 9;
+                    rangeDetails = "상당한 투자 지연 피해 및 자산 거래 누락";
+                }
+            } else { // willful (고의)
+                if (importance === 'minor') {
+                    basePoints = 8;
+                    rangeDetails = "의도적인 공시 지연 또는 허위 진술 포함";
+                } else if (importance === 'moderate') {
+                    basePoints = 12;
+                    rangeDetails = "시황에 인위적 영향을 준 의도적 거래 미신고 (제재금 중대 병과)";
+                } else {
+                    basePoints = 16;
+                    rangeDetails = "심각한 시황 왜곡 행위. 즉각 관리종목 지정 및 임원 교체 사유";
+                }
+            }
+
+            // Estimate additional fines (시행세칙 제13조의3 추가부과)
+            // 벌점 5점 이상일 시 벌점당 1,000만 원 (고의/중과실의 경우 벌점당 2,000만 원)
+            if (basePoints >= 5) {
+                let multiplier = (motive === 'willful') ? 20000000 : 10000000;
+                let calculatedFine = basePoints * multiplier;
+                additionalFine = formatKoreanWord(calculatedFine);
+            }
+
+            // Injects estimates
+            document.getElementById('estPoints').innerText = `${basePoints}점`;
+            document.getElementById('estPointsDetails').innerText = `원인 범위: ${rangeDetails}`;
+            document.getElementById('estFines').innerText = additionalFine;
+        }
+
+        // --- NEW IMPORTER FEATURE SCRIPTS ---
+        
+        // Collapsible toggle for Importer Widget
+        function toggleImporter() {
+            const content = document.getElementById('importerContent');
+            const chevron = document.getElementById('importerChevron');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = "rotate(180deg)";
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = "rotate(0deg)";
+            }
+        }
+
+        // Direct DoubleUGames Preset Injection
+        function loadDoubleUFiles(mode) {
+            // Dec 31, 2025 Consolidated vs Separate details from DART
+            if (mode === 'consolidated') {
+                financialData.Asset = 1847862000000;
+                financialData.Revenue = 719897000000;
+                financialData.Equity = 1652363000000;
+                financialData.PaidCapital = 10840000000;
+            } else {
+                financialData.Asset = 778969000000;
+                financialData.Revenue = 175381000000;
+                financialData.Equity = 730479000000;
+                financialData.PaidCapital = 10840000000;
+            }
+
+            // Update UI
+            updateInputFieldsToUnit();
+            updateLabelDisplays();
+            evaluateDisclosureCompliance();
+
+            // Notify User
+            const feedbackEl = document.getElementById('importFeedback');
+            feedbackEl.classList.remove('hidden');
+            feedbackEl.className = "p-3 text-xs rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 space-y-1.5";
+            const modeName = mode === 'consolidated' ? '연결' : '별도';
+            
+            feedbackEl.innerHTML = `
+                <div class="flex items-center gap-1.5 font-bold">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                    <span>더블유게임즈 2025년 ${modeName} 결산 완료!</span>
+                </div>
+                <ul class="list-disc pl-4 space-y-0.5 font-medium">
+                    <li>자산총계: ${formatKoreanWord(financialData.Asset)}</li>
+                    <li>매출액: ${formatKoreanWord(financialData.Revenue)}</li>
+                    <li>자기자본: ${formatKoreanWord(financialData.Equity)}</li>
+                    <li>자본금: ${formatKoreanWord(financialData.PaidCapital)}</li>
+                </ul>
+                <p class="text-[10px] text-emerald-600 font-semibold pt-1">최근 사업보고서 재무정보가 안정적으로 주입되었습니다.</p>
+            `;
+            lucide.createIcons();
+        }
+
+        // Drag & Drop / File Select File reading
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) readAndLoadText(file);
+        }
+
+        function handleFileDrop(event) {
+            event.preventDefault();
+            document.getElementById('dropZone').classList.remove('border-krx-blue', 'bg-slate-50');
+            const file = event.dataTransfer.files[0];
+            if (file) readAndLoadText(file);
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            document.getElementById('dropZone').classList.add('border-krx-blue', 'bg-slate-50');
+        }
+
+        function handleDragLeave() {
+            document.getElementById('dropZone').classList.remove('border-krx-blue', 'bg-slate-50');
+        }
+
+        function readAndLoadText(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                document.getElementById('pasteArea').value = text;
+                
+                // Show successfully loaded file message
+                const feedbackEl = document.getElementById('importFeedback');
+                feedbackEl.classList.remove('hidden');
+                feedbackEl.className = "p-3 text-xs rounded-xl border bg-blue-50 border-blue-200 text-blue-800";
+                feedbackEl.innerHTML = `
+                    <div class="flex items-center gap-1.5 font-bold">
+                        <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i>
+                        <span>텍스트 파일 로드 완료 (${file.name})</span>
+                    </div>
+                    <p class="text-[10px] text-blue-600 mt-1">파일의 텍스트가 아래 붙여넣기 란에 채워졌습니다. '파싱 및 적용' 버튼을 눌러 확정해 주십시오.</p>
+                `;
+                lucide.createIcons();
+            };
+            reader.readAsText(file);
+        }
+
+        // Smart Regex Parser for Financial reports from DART
+        function parseAndApplyText() {
+            const text = document.getElementById('pasteArea').value;
+            const feedbackEl = document.getElementById('importFeedback');
+            
+            if (!text.trim()) {
+                feedbackEl.classList.remove('hidden');
+                feedbackEl.className = "p-3 text-xs rounded-xl border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-2";
+                feedbackEl.innerHTML = `
+                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold">입력된 텍스트가 없습니다.</p>
+                        <p class="text-[10px] text-rose-600 mt-0.5">보고서 내용을 복사하여 붙여넣거나 파일을 업로드해 주세요.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            // Let's check if the text is JSON format
+            let parsedData = { Asset: null, Revenue: null, Equity: null, PaidCapital: null };
+            let isJson = false;
+            try {
+                const jsonObj = JSON.parse(text);
+                if (jsonObj) {
+                    parsedData.Asset = jsonObj.Asset || jsonObj.asset || null;
+                    parsedData.Revenue = jsonObj.Revenue || jsonObj.revenue || null;
+                    parsedData.Equity = jsonObj.Equity || jsonObj.equity || null;
+                    parsedData.PaidCapital = jsonObj.PaidCapital || jsonObj.paidCapital || jsonObj.paid_capital || null;
+                    isJson = true;
+                }
+            } catch (e) {
+                // Not JSON, treat as text
+            }
+
+            if (!isJson) {
+                // Text-based Keyword Regex Engine
+                const lines = text.split('\n');
+                
+                // Regex cleaner for numerals (converts multiple separators like '1.847.862' or '1,847,862' safely)
+                function cleanNumberStr(str) {
+                    let clean = str.replace(/[^0-9.,]/g, '');
+                    const periods = (clean.match(/\./g) || []).length;
+                    const commas = (clean.match(/,/g) || []).length;
+                    
+                    if (periods > 1) clean = clean.replace(/\./g, '');
+                    if (commas > 0) clean = clean.replace(/,/g, '');
+                    if (periods === 1 && commas === 0) {
+                        const parts = clean.split('.');
+                        if (parts[1].length === 3) clean = clean.replace(/\./g, '');
+                    }
+                    
+                    let val = parseFloat(clean);
+                    return isNaN(val) ? null : val;
+                }
+
+                function findFirstNumAfter(line, keywordIdx) {
+                    const sub = line.substring(keywordIdx);
+                    const numMatches = sub.match(/[\d,.]+/g);
+                    if (!numMatches) return null;
+                    for (let match of numMatches) {
+                        let parsed = cleanNumberStr(match);
+                        if (parsed && parsed > 10) return parsed;
+                    }
+                    return null;
+                }
+
+                lines.forEach(line => {
+                    const compact = line.replace(/\s+/g, '');
+                    
+                    // Asset Check
+                    if (compact.includes('자산총계') || compact.includes('자산총액') || compact.includes('자산의합계')) {
+                        const idx = line.indexOf('자산');
+                        const num = findFirstNumAfter(line, idx);
+                        if (num && !parsedData.Asset) parsedData.Asset = num;
+                    }
+                    // Revenue Check
+                    if (compact.includes('매출액') || compact.includes('영업수익') || compact.includes('매출액계')) {
+                        const idx = line.indexOf('매출') >= 0 ? line.indexOf('매출') : line.indexOf('영업');
+                        const num = findFirstNumAfter(line, idx);
+                        if (num && !parsedData.Revenue) parsedData.Revenue = num;
+                    }
+                    // Equity Check
+                    if (compact.includes('자본총계') || compact.includes('자기자본') || compact.includes('자본의합계') || compact.includes('자본총액')) {
+                        const idx = line.indexOf('자본') >= 0 ? line.indexOf('자본') : line.indexOf('자기');
+                        const num = findFirstNumAfter(line, idx);
+                        if (num && !parsedData.Equity) parsedData.Equity = num;
+                    }
+                    // Paid Capital Check
+                    if (compact.includes('자본금') || compact.includes('납입자본금')) {
+                        const idx = line.indexOf('자본');
+                        const num = findFirstNumAfter(line, idx);
+                        if (num && !parsedData.PaidCapital) parsedData.PaidCapital = num;
+                    }
+                });
+            }
+
+            // Multiplier Scaler Evaluation
+            let multiplier = 1;
+            const chosenUnit = document.getElementById('importUnitSelect').value;
+            
+            if (chosenUnit === 'auto') {
+                // Failsafe auto-scale heuristic
+                if (parsedData.Asset) {
+                    if (parsedData.Asset < 10000) {
+                        multiplier = 100000000; // in 100 million KRW (억원)
+                    } else if (parsedData.Asset < 10000000) {
+                        multiplier = 1000000;   // in millions KRW (백만원 - DART default)
+                    } else if (parsedData.Asset < 10000000000) {
+                        multiplier = 1000;      // in thousands KRW (천원)
+                    }
+                }
+            } else {
+                multiplier = parseInt(chosenUnit);
+            }
+
+            // Apply scaled values to app state if detected
+            let appliedFields = [];
+            if (parsedData.Asset) {
+                financialData.Asset = parsedData.Asset * multiplier;
+                appliedFields.push(`자산총계 (${formatKoreanWord(financialData.Asset)})`);
+            }
+            if (parsedData.Revenue) {
+                financialData.Revenue = parsedData.Revenue * multiplier;
+                appliedFields.push(`매출액 (${formatKoreanWord(financialData.Revenue)})`);
+            }
+            if (parsedData.Equity) {
+                financialData.Equity = parsedData.Equity * multiplier;
+                appliedFields.push(`자기자본 (${formatKoreanWord(financialData.Equity)})`);
+            }
+            if (parsedData.PaidCapital) {
+                financialData.PaidCapital = parsedData.PaidCapital * multiplier;
+                appliedFields.push(`자본금 (${formatKoreanWord(financialData.PaidCapital)})`);
+            }
+
+            // Show feedback depending on output
+            feedbackEl.classList.remove('hidden');
+            if (appliedFields.length > 0) {
+                feedbackEl.className = "p-3 text-xs rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 space-y-1.5";
+                
+                let unitName = "원(KRW)";
+                if (multiplier === 1000) unitName = "천 원";
+                if (multiplier === 1000000) unitName = "백만 원";
+                if (multiplier === 100000000) unitName = "억 원";
+                
+                feedbackEl.innerHTML = `
+                    <div class="flex items-center gap-1.5 font-bold">
+                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+                        <span>재무 데이터 파싱 완료! (배율단위: ${unitName})</span>
+                    </div>
+                    <ul class="list-disc pl-4 space-y-0.5 font-semibold">
+                        ${appliedFields.map(f => `<li>${f}</li>`).join('')}
+                    </ul>
+                    <p class="text-[10px] text-emerald-600 font-bold pt-1">파싱된 재무정보가 기본정보에 자동 매핑되었습니다.</p>
+                `;
+
+                // Update input forms
+                updateInputFieldsToUnit();
+                updateLabelDisplays();
+                evaluateDisclosureCompliance();
+            } else {
+                feedbackEl.className = "p-3 text-xs rounded-xl border bg-amber-50 border-amber-200 text-amber-800 flex items-start gap-2";
+                feedbackEl.innerHTML = `
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <p class="font-bold">키워드 인식 실패</p>
+                        <p class="text-[10px] text-amber-600 mt-0.5">텍스트 내에 '자산총계', '매출액', '자본총계/자기자본', '자본금' 등의 주요 재무 키워드 및 금액이 정합성 있게 포함되어 있는지 확인해 주세요.</p>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
