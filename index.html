@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KRX KOSPI 공시 의무 종합 검토 시스템</title>
+    <title>2026년 공시 검토 시스템</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tailwind CSS Configuration for custom fonts and animations -->
     <script>
         tailwind.config = {
             theme: {
@@ -27,7 +26,6 @@
     </script>
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Custom styling for print & UI -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap');
         body {
@@ -48,7 +46,6 @@
                 padding: 0 !important;
             }
         }
-        /* Custom dynamic meter transition */
         .gauge-transition {
             transition: stroke-dashoffset 0.8s ease-in-out;
         }
@@ -64,18 +61,18 @@
                     <i data-lucide="scale" class="w-8 h-8 text-yellow-400"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight">KOSPI 공시 의무 종합 검토 시스템</h1>
-                    <p class="text-xs text-slate-400">KRX 유가증권시장 공시규정 및 시행세칙 기준 (2026년 개정안 완벽 반영)</p>
+                    <h1 class="text-xl font-bold tracking-tight">2026년 공시 검토 시스템</h1>
+                    <p class="text-xs text-slate-400">(주)더블유게임즈 제14기 확정감사 재무 반영 시뮬레이터 (KOSPI 공시 기준)</p>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
                 <span class="inline-flex items-center bg-slate-800 text-xs text-slate-300 px-3 py-1.5 rounded-full border border-slate-700">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                    실무자 검토용 시뮬레이터 (기준일: 2026.06.11)
+                    실무용 고정 버전 (기준일: 2026.06.11)
                 </span>
                 <button onclick="window.print()" class="bg-krx-blue hover:bg-blue-600 transition text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm">
                     <i data-lucide="printer" class="w-4 h-4"></i>
-                    보고서 인쇄
+                    의견서 인쇄
                 </button>
             </div>
         </div>
@@ -87,198 +84,42 @@
         <!-- Left Sidebar: Financial Inputs & Selectable Events -->
         <section class="w-full lg:w-5/12 space-y-6 no-print">
             
-            <!-- NEW SMART FINTECH IMPORTER WIDGET -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 cursor-pointer" onclick="toggleImporter()">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="file-down" class="w-5 h-5 text-indigo-600"></i>
-                        <h2 class="font-bold text-slate-900">재무 데이터 스마트 임포터</h2>
-                    </div>
-                    <i data-lucide="chevron-down" id="importerChevron" class="w-4 h-4 text-slate-500 transition-transform duration-200"></i>
-                </div>
-                
-                <div id="importerContent" class="space-y-4 pt-1">
-                    <!-- Preset Buttons -->
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">더블유게임즈 2025년 결산 프리셋 (제14기)</span>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="loadDoubleUFiles('consolidated')" class="bg-krx-navy text-white text-xs font-bold py-2.5 px-3 rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-1.5 shadow-sm">
-                                <i data-lucide="layers" class="w-4 h-4 text-yellow-400"></i>
-                                연결 재무제표 로드
-                            </button>
-                            <button onclick="loadDoubleUFiles('separate')" class="bg-slate-100 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl hover:bg-slate-200 transition flex items-center justify-center gap-1.5 border border-slate-200">
-                                <i data-lucide="file-text" class="w-4 h-4 text-slate-500"></i>
-                                별도 재무제표 로드
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- File Drag & Drop -->
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">텍스트 파일(.txt) 업로드 및 파싱</span>
-                        <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center cursor-pointer hover:border-krx-blue hover:bg-slate-50 transition bg-white"
-                             onclick="document.getElementById('fileInput').click()"
-                             ondragover="handleDragOver(event)"
-                             ondragleave="handleDragLeave()"
-                             ondrop="handleFileDrop(event)">
-                            <i data-lucide="upload-cloud" class="w-7 h-7 text-slate-400 mx-auto mb-2"></i>
-                            <p class="text-xs font-semibold text-slate-700">이곳에 텍스트 파일을 끌어다 놓거나 클릭하세요</p>
-                            <p class="text-[10px] text-slate-400 mt-1">DART 등 요약 재무 테이블 자동 감지 지원</p>
-                            <input type="file" id="fileInput" class="hidden" accept=".txt,.json" onchange="handleFileSelect(event)">
-                        </div>
-                    </div>
-                    
-                    <!-- Text Area for copy paste -->
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">복사한 텍스트 붙여넣기</span>
-                        <textarea id="pasteArea" rows="3" class="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:border-krx-blue focus:ring-krx-blue font-medium bg-slate-50 focus:bg-white transition" placeholder="여기에 사업보고서 요약 재무표 텍스트나 데이터를 직접 붙여넣으셔도 자동으로 한글 키워드를 인식하여 완벽히 추출합니다."></textarea>
-                    </div>
-                    
-                    <!-- Parse Options -->
-                    <div class="flex items-center justify-between text-xs pt-1">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-slate-500 font-semibold">단위 배율:</span>
-                            <select id="importUnitSelect" class="bg-white border border-slate-300 rounded-lg p-1.5 text-[11px] font-bold text-slate-700 focus:border-krx-blue outline-none cursor-pointer">
-                                <option value="auto">자동 감지 (Heuristic)</option>
-                                <option value="1">원 (Actual KRW)</option>
-                                <option value="1000">천 원</option>
-                                <option value="1000000">백만 원 (DART 표준)</option>
-                                <option value="100000000">억 원</option>
-                            </select>
-                        </div>
-                        <button onclick="parseAndApplyText()" class="bg-krx-blue hover:bg-blue-600 text-white font-bold text-xs py-2 px-3.5 rounded-xl transition shadow-sm flex items-center gap-1">
-                            <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
-                            파싱 및 적용
-                        </button>
-                    </div>
-                    
-                    <!-- Feedback Notification -->
-                    <div id="importFeedback" class="hidden text-xs p-3 rounded-xl border transition-all duration-300">
-                        <!-- Filled dynamically -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Widget 1: Listing Company Financial Base Data -->
+            <!-- Audited Financial Report (Read Only / Swappable) -->
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
                     <div class="flex items-center space-x-2">
-                        <i data-lucide="building-2" class="w-5 h-5 text-krx-blue"></i>
-                        <h2 class="font-bold text-slate-900">1. 기업 재무 기본정보 입력</h2>
+                        <i data-lucide="shield-check" class="w-5 h-5 text-krx-blue"></i>
+                        <h2 class="font-bold text-slate-900">제14기 확정 감사 재무정보 <span class="text-[10px] text-slate-400">(주평가 데이터)</span></h2>
                     </div>
-                    <!-- Unit Selector Toggle -->
+                    <!-- Accounting Standard Toggle Tab -->
                     <div class="flex bg-slate-100 p-1 rounded-lg">
-                        <button id="unitBtnWon" onclick="setUnit('won')" class="px-3 py-1 rounded text-xs font-semibold transition bg-white text-slate-800 shadow-sm">원 (KRW)</button>
-                        <button id="unitBtnEok" onclick="setUnit('eok')" class="px-3 py-1 rounded text-xs font-semibold transition text-slate-500 hover:text-slate-800">억 원</button>
+                        <button id="standardBtnCons" onclick="setStandard('consolidated')" class="px-2.5 py-1.5 rounded text-xs font-bold transition bg-white text-slate-800 shadow-sm flex items-center gap-1">
+                            <i data-lucide="layers" class="w-3.5 h-3.5 text-krx-blue"></i> 연결재무제표
+                        </button>
+                        <button id="standardBtnSep" onclick="setStandard('separate')" class="px-2.5 py-1.5 rounded text-xs font-bold transition text-slate-500 hover:text-slate-800 flex items-center gap-1">
+                            <i data-lucide="file-text" class="w-3.5 h-3.5 text-slate-400"></i> 별도재무제표
+                        </button>
                     </div>
                 </div>
 
-                <div class="space-y-4">
-                    <!-- Asset Input -->
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                자산총액
-                                <span class="group relative cursor-pointer text-slate-400 hover:text-slate-600">
-                                    <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
-                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-56 p-2 bg-slate-900 text-white text-[11px] rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition z-50 leading-relaxed">
-                                        최근 사업연도말 재무제표 기준입니다. 2조 원 이상일 시 '대규모법인'으로 판정됩니다.
-                                    </span>
-                                </span>
-                            </label>
-                            <span id="labelAssetKrw" class="text-xs text-krx-blue font-medium">0원</span>
-                        </div>
-                        <div class="relative rounded-lg shadow-sm">
-                            <input type="text" id="inputAsset" oninput="handleFinancialInput('Asset', this.value)" class="block w-full rounded-lg border-slate-300 pr-12 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2.5 font-medium" placeholder="0">
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <span class="text-slate-400 text-xs font-semibold" id="unitLabelAsset">원</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-1.5 mt-1">
-                            <button onclick="addFinancialValue('Asset', 10)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">10억</button>
-                            <button onclick="addFinancialValue('Asset', 100)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">100억</button>
-                            <button onclick="addFinancialValue('Asset', 1000)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">1,000억</button>
-                            <button onclick="addFinancialValue('Asset', 20000)" class="text-[11px] bg-krx-blue/10 text-krx-blue px-2 py-1 rounded hover:bg-krx-blue/20 font-semibold">2조(대규모)</button>
-                        </div>
+                <!-- Display Base Metrics -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase">최근사업연도 자산총액</span>
+                        <span id="displayAsset" class="text-base font-extrabold text-slate-800 mt-1 block">0원</span>
                     </div>
-
-                    <!-- Revenue Input -->
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                최근 사업연도 매출액
-                                <span class="group relative cursor-pointer text-slate-400 hover:text-slate-600">
-                                    <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
-                                    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 w-56 p-2 bg-slate-900 text-white text-[11px] rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition z-50 leading-relaxed">
-                                        영업정지, 공급계약 등 영업활동 관련 공시의 판단 기준이 됩니다.
-                                    </span>
-                                </span>
-                            </label>
-                            <span id="labelRevenueKrw" class="text-xs text-krx-blue font-medium">0원</span>
-                        </div>
-                        <div class="relative rounded-lg shadow-sm">
-                            <input type="text" id="inputRevenue" oninput="handleFinancialInput('Revenue', this.value)" class="block w-full rounded-lg border-slate-300 pr-12 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2.5 font-medium" placeholder="0">
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                <span class="text-slate-400 text-xs font-semibold" id="unitLabelRevenue">원</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-1.5 mt-1">
-                            <button onclick="addFinancialValue('Revenue', 10)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">10억</button>
-                            <button onclick="addFinancialValue('Revenue', 50)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">50억</button>
-                            <button onclick="addFinancialValue('Revenue', 500)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">500억</button>
-                            <button onclick="addFinancialValue('Revenue', 2000)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">2,000억</button>
-                        </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase">최근사업연도 매출액</span>
+                        <span id="displayRevenue" class="text-base font-extrabold text-slate-800 mt-1 block">0원</span>
                     </div>
-
-                    <!-- Row Grid: Equity vs Paid-in Capital -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <!-- Equity Input -->
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                    자기자본
-                                    <span class="group relative cursor-pointer text-slate-400 hover:text-slate-600">
-                                        <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
-                                        <span class="absolute bottom-full left-[20%] mb-1 w-56 p-2 bg-slate-900 text-white text-[11px] rounded shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 transition z-50 leading-relaxed">
-                                            자산총액 - 부채총액에 기초합니다. 만약 자본금 미만인 경우 자본금을 대체 자기자본으로 봅니다(규정 제3조 제5항).
-                                        </span>
-                                    </span>
-                                </label>
-                            </div>
-                            <div class="relative rounded-lg shadow-sm">
-                                <input type="text" id="inputEquity" oninput="handleFinancialInput('Equity', this.value)" class="block w-full rounded-lg border-slate-300 pr-10 focus:border-krx-blue focus:ring-krx-blue sm:text-xs border p-2 font-medium" placeholder="0">
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <span class="text-slate-400 text-[10px] font-semibold" id="unitLabelEquity">원</span>
-                                </div>
-                            </div>
-                            <span id="labelEquityKrw" class="text-[10px] text-slate-500 block mt-1 overflow-hidden text-ellipsis whitespace-nowrap">0원</span>
-                        </div>
-
-                        <!-- Paid-in Capital Input -->
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="text-xs font-semibold text-slate-600 flex items-center gap-1">
-                                    자본금
-                                </label>
-                            </div>
-                            <div class="relative rounded-lg shadow-sm">
-                                <input type="text" id="inputPaidCapital" oninput="handleFinancialInput('PaidCapital', this.value)" class="block w-full rounded-lg border-slate-300 pr-10 focus:border-krx-blue focus:ring-krx-blue sm:text-xs border p-2 font-medium" placeholder="0">
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                    <span class="text-slate-400 text-[10px] font-semibold" id="unitLabelPaidCapital">원</span>
-                                </div>
-                            </div>
-                            <span id="labelPaidCapitalKrw" class="text-[10px] text-slate-500 block mt-1 overflow-hidden text-ellipsis whitespace-nowrap">0원</span>
-                        </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase">자기자본 (자본잠식 조정 적용)</span>
+                        <span id="displayEquity" class="text-base font-extrabold text-slate-800 mt-1 block">0원</span>
                     </div>
-
-                    <!-- Adjusted Equity Info Banner -->
-                    <div id="adjustedEquityBanner" class="hidden bg-amber-50 border border-amber-200 text-amber-800 rounded-xl p-3 text-xs flex items-start gap-2">
-                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
-                        <div>
-                            <span class="font-bold">자본잠식 조정 규정 적용(제3조 제5항):</span> 자기자본이 자본금 미만입니다. 자본금인 <span id="adjustedEquityVal" class="font-bold"></span> 을 자기자본 임계 판단 기준으로 설정합니다.
-                        </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase">납입 자본금</span>
+                        <span id="displayPaidCapital" class="text-base font-extrabold text-slate-800 mt-1 block">0원</span>
                     </div>
-                    
                 </div>
             </div>
 
@@ -287,13 +128,13 @@
                 <div class="border-b border-slate-100 pb-3 mb-4">
                     <div class="flex items-center space-x-2">
                         <i data-lucide="file-search" class="w-5 h-5 text-krx-blue"></i>
-                        <h2 class="font-bold text-slate-900">2. 공시 대상 유형 선택</h2>
+                        <h2 class="font-bold text-slate-900">1. 공시 대상 유형 선택</h2>
                     </div>
                 </div>
 
                 <!-- Search Input -->
                 <div class="relative mb-3">
-                    <input type="text" id="disclosureSearch" oninput="filterDisclosureItems()" class="block w-full rounded-lg border-slate-300 pl-9 pr-3 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2" placeholder="공시 유형 또는 키워드 검색 (예: 계약, 유형자산)...">
+                    <input type="text" id="disclosureSearch" oninput="filterDisclosureItems()" class="block w-full rounded-lg border-slate-300 pl-9 pr-3 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2" placeholder="공시 유형 또는 키워드 검색 (예: 공급계약, 종속회사)...">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
                     </div>
@@ -306,6 +147,7 @@
                     <button onclick="filterCategory('투자 및 자산 활동')" id="catBtn_투자" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition">투자·자산</button>
                     <button onclick="filterCategory('채무 및 재무 구조')" id="catBtn_채무" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition">채무·재무</button>
                     <button onclick="filterCategory('손실 및 재해')" id="catBtn_손실" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition">손실·재해</button>
+                    <button onclick="filterCategory('종속회사 공시')" id="catBtn_종속" class="text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-3 py-1 rounded-full transition">종속회사 전용</button>
                 </div>
 
                 <!-- Dynamic Item List Container -->
@@ -319,7 +161,7 @@
                 <div class="border-b border-slate-100 pb-3 mb-4">
                     <div class="flex items-center space-x-2">
                         <i data-lucide="coins" class="w-5 h-5 text-krx-blue"></i>
-                        <h2 class="font-bold text-slate-900">3. 발생 사건/거래 금액 입력</h2>
+                        <h2 class="font-bold text-slate-900">2. 발생 사건/거래 금액 입력</h2>
                     </div>
                 </div>
 
@@ -331,7 +173,7 @@
                     <div class="relative rounded-lg shadow-sm">
                         <input type="text" id="inputEventAmount" oninput="handleEventAmountInput(this.value)" class="block w-full rounded-lg border-slate-300 pr-12 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2.5 font-medium" placeholder="0">
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <span class="text-slate-400 text-xs font-semibold" id="unitLabelEvent">원</span>
+                            <span class="text-slate-400 text-xs font-semibold">억 원</span>
                         </div>
                     </div>
                     <div class="flex gap-1.5 mt-1">
@@ -339,6 +181,7 @@
                         <button onclick="addEventValue(10)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">+10억</button>
                         <button onclick="addEventValue(50)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">+50억</button>
                         <button onclick="addEventValue(100)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">+100억</button>
+                        <button onclick="addEventValue(500)" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded hover:bg-slate-200">+500억</button>
                     </div>
                 </div>
             </div>
@@ -356,7 +199,7 @@
 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-100 pb-4 mb-5">
                     <div>
-                        <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">공무 검토 진단 결과</span>
+                        <span class="text-[11px] font-bold tracking-wider text-slate-400 uppercase">공시 검토 결과</span>
                         <h2 class="text-xl font-extrabold text-slate-900" id="selectedDisclosureTitle">검토 대상 공시를 선택해 주세요</h2>
                         <p class="text-xs text-slate-500 mt-1" id="selectedDisclosureCategory">-</p>
                     </div>
@@ -370,13 +213,22 @@
                 <!-- Initial prompt state -->
                 <div id="resultInitialState" class="py-12 text-center text-slate-400 flex flex-col items-center justify-center space-y-3">
                     <i data-lucide="shield-alert" class="w-16 h-16 text-slate-300 animate-bounce"></i>
-                    <p class="font-medium text-slate-500">왼쪽 패널에서 재무정보와 공시유형을 입력해 주세요.</p>
-                    <p class="text-xs text-slate-400">규정 기준선 초과 시 즉각적인 경고 및 일정가이드를 제공합니다.</p>
+                    <p class="font-medium text-slate-500">왼쪽 패널에서 공시 대상 유형과 금액을 입력해 주세요.</p>
+                    <p class="text-xs text-slate-400">규정 기준선 초과 시 즉각적인 경고 및 실무 가이드를 출력합니다.</p>
                 </div>
 
                 <!-- Analysis Details Section (Hidden until valid inputs) -->
                 <div id="resultAnalysisArea" class="hidden space-y-6">
                     
+                    <!-- separateMandateBanner (visible only when separate statement is mandatory) -->
+                    <div id="separateMandateBanner" class="hidden bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl p-3.5 text-xs flex items-start gap-2.5">
+                        <i data-lucide="shield-alert" class="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5 animate-pulse"></i>
+                        <div>
+                            <span class="font-bold block text-sm text-indigo-950" id="separateMandateTitle">별도 재무제표 의무 적용 대상</span> 
+                            <span class="mt-1 block text-slate-600 leading-relaxed" id="separateMandateDesc">이 공시 유형은 규정상...</span>
+                        </div>
+                    </div>
+
                     <!-- Major Diagnostic Verdict Banner -->
                     <div id="verdictBanner" class="p-5 rounded-2xl flex items-start gap-4 transition-all duration-300">
                         <div id="verdictIconBox" class="p-3 rounded-xl">
@@ -484,12 +336,12 @@
 
                 <div class="text-center border-b-2 border-slate-800 pb-5 mb-6">
                     <h2 class="text-2xl font-extrabold tracking-wide uppercase">공시 의무 자체 검토 의견서</h2>
-                    <p class="text-xs text-slate-500 mt-1">유가증권시장 공시규정 제7조 (주요경영사항 등) 실무 심사 결과</p>
+                    <p class="text-xs text-slate-500 mt-1">유가증권시장 공시규정 제7조 및 제8조의2 실무 자체 진단 보고서</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 text-xs mb-6">
                     <div>
-                        <p><strong>발행인:</strong> 유가증권시장 주권상장법인</p>
+                        <p><strong>발행인:</strong> 주식회사 더블유게임즈</p>
                         <p><strong>진단 기준일:</strong> 2026년 06월 11일</p>
                         <p><strong>심사 법인규모:</strong> <span id="printCorpScale" class="font-bold">-</span></p>
                     </div>
@@ -499,22 +351,22 @@
                     </div>
                 </div>
 
-                <h3 class="text-sm font-bold border-l-4 border-slate-800 pl-2 mb-3 uppercase tracking-wider">1. 기초 재무 현황</h3>
+                <h3 class="text-sm font-bold border-l-4 border-slate-800 pl-2 mb-3 uppercase tracking-wider">1. 제14기 확정 재무 현황</h3>
                 <table class="w-full border-collapse border border-slate-300 text-xs text-left mb-6">
                     <thead>
                         <tr class="bg-slate-100">
-                            <th class="border border-slate-300 p-2">자산총액</th>
-                            <th class="border border-slate-300 p-2">최근 사업연도 매출액</th>
-                            <th class="border border-slate-300 p-2">자기자본</th>
-                            <th class="border border-slate-300 p-2">자본금</th>
+                            <th class="border border-slate-300 p-2 text-center font-bold">자산총액</th>
+                            <th class="border border-slate-300 p-2 text-center font-bold">최근 매출액</th>
+                            <th class="border border-slate-300 p-2 text-center font-bold">자기자본</th>
+                            <th class="border border-slate-300 p-2 text-center font-bold">자본금</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td class="border border-slate-300 p-2" id="printAsset">-</td>
-                            <td class="border border-slate-300 p-2" id="printRevenue">-</td>
-                            <td class="border border-slate-300 p-2" id="printEquity">-</td>
-                            <td class="border border-slate-300 p-2" id="printPaidCapital">-</td>
+                        <tr class="text-center">
+                            <td class="border border-slate-300 p-2.5 font-semibold text-slate-700" id="printAsset">-</td>
+                            <td class="border border-slate-300 p-2.5 font-semibold text-slate-700" id="printRevenue">-</td>
+                            <td class="border border-slate-300 p-2.5 font-semibold text-slate-700" id="printEquity">-</td>
+                            <td class="border border-slate-300 p-2.5 font-semibold text-slate-700" id="printPaidCapital">-</td>
                         </tr>
                     </tbody>
                 </table>
@@ -529,6 +381,10 @@
                         <tr>
                             <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">해당 근거 조항</th>
                             <td class="border border-slate-300 p-2" id="printRuleCitation">-</td>
+                        </tr>
+                        <tr>
+                            <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">적용 회계기준</th>
+                            <td class="border border-slate-300 p-2 font-bold text-indigo-900" id="printAccountingStandard">-</td>
                         </tr>
                         <tr>
                             <th class="border border-slate-300 bg-slate-50 p-2 w-1/4">사건 발생/거래액</th>
@@ -550,18 +406,8 @@
                 </table>
 
                 <h3 class="text-sm font-bold border-l-4 border-slate-800 pl-2 mb-3 uppercase tracking-wider">3. 실무자 검토 소견</h3>
-                <div class="border border-slate-300 rounded p-3 text-xs leading-relaxed bg-slate-50 mb-8" id="printOpinion">
+                <div class="border border-slate-300 rounded p-3.5 text-xs leading-relaxed bg-slate-50" id="printOpinion">
                     -
-                </div>
-
-                <div class="flex justify-between items-end mt-12 text-xs">
-                    <div class="text-slate-500">
-                        * 본 보고서는 KRX 상장법인 공시 자가 검토용 툴에 의해 자체 작성되었으며,<br>정식 유고 판단은 공식 법률전문가 및 한국거래소 공시관리부를 통해 재검토 하십시오.
-                    </div>
-                    <div class="text-center w-48">
-                        <p class="mb-8">검토담당 사외이사 / 공시책임자</p>
-                        <p class="border-t border-slate-400 pt-1 text-slate-600">(인 또는 서명)</p>
-                    </div>
                 </div>
             </div>
 
@@ -732,7 +578,7 @@
                         공시 의무 비율에 소폭 미달하여 의무 공시가 아닌 경우, 자율공시가 가능한가요?
                     </p>
                     <p class="text-xs text-slate-600 leading-relaxed pl-1">
-                        <strong>답변:</strong> 네, 가능합니다. 규정 제28조(자율공시) 및 시행세칙 제8조 제20호에 따라 의무 공시 비율에 미달하더라도 투자판단에 중요하다고 간주되는 사건의 경우 사유발생 다음 날까지 자율적으로 거래소에 신고 및 공시를 진행할 수 있습니다.
+                        <strong>답변:</strong> 네, 가능합니다. 규정 제28조(자율공시) 및 시행세칙 제8조 제20호에 따라 의무 공시 비율에 미달하더라도 투자판단에 중요하다고 간주되는 사건의 경우사유발생 다음 날까지 자율적으로 거래소에 신고 및 공시를 진행할 수 있습니다.
                     </p>
                 </div>
 
@@ -760,7 +606,22 @@
 
     <!-- Core Interactive Application Engine (Pure JS) -->
     <script>
-        // Data Store containing disclosure items
+        // Audited reports mapping from 제14기 삼일회계법인 감사보고서 (더블유게임즈)
+        const AUDITED_REPORTS = {
+            consolidated: {
+                Asset: 1847861880558,
+                Revenue: 719897452508,
+                Equity: 1652363475394,
+                PaidCapital: 10839825500
+            },
+            separate: {
+                Asset: 778969333217,
+                Revenue: 175380599723,
+                Equity: 730479327273,
+                PaidCapital: 10839825500
+            }
+        };
+
         const DISCLOSURE_ITEMS = {
             sales_contract: {
                 id: 'sales_contract',
@@ -773,6 +634,7 @@
                 deadlineType: '익일',
                 deadlineDesc: '사유발생일 다음 날 18시까지 신고',
                 inputLabel: '계약 금액 (해당 지분액)',
+                mandatoryBasis: 'consolidated',
                 desc: '단일판매계약 또는 공급계약을 체결하거나 계약을 해지한 때 공시 의무가 발생합니다.'
             },
             business_halt: {
@@ -786,6 +648,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고 (정지결정 또는 처분 통지 시)',
                 inputLabel: '정지 대상 영업 부문 매출액',
+                mandatoryBasis: 'consolidated',
                 desc: '주요 영업의 일부 또는 전부가 정지(행정처분 포함)되거나 이를 이사회에서 결의한 때 적용됩니다.'
             },
             customer_stop: {
@@ -799,6 +662,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '중단 대상 거래처에 대한 최근 연간 매출액',
+                mandatoryBasis: 'consolidated',
                 desc: '최근 사업연도 매출총액 중 중단된 주요 매출 거래처와의 거래 규모를 기준으로 합니다.'
             },
             product_recall: {
@@ -812,6 +676,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '해당 품목 매출액 또는 수거/파기 소요 예상액',
+                mandatoryBasis: 'consolidated',
                 desc: '제품의 안전 문제 등으로 수거 및 파기 등 중대 조치를 결정한 때 공시 의무가 발생합니다.'
             },
             factory_stop: {
@@ -825,6 +690,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '해당 공장 최근 매출 생산액',
+                mandatoryBasis: 'consolidated',
                 desc: '주요 생산 공장의 중단, 가동 불능 또는 폐업 발생 시 판단 기준이 됩니다.'
             },
             asset_deal: {
@@ -838,6 +704,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고 (이사회 결의 또는 취득 계약일 중 빠른 날)',
                 inputLabel: '유형자산 거래/처분 금액',
+                mandatoryBasis: 'consolidated',
                 desc: '임대용 부동산을 포함한 고정자산의 양수/양도액 및 사모 투자기구 자산 등의 금액 기준입니다.'
             },
             equity_investment: {
@@ -851,6 +718,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '출자 인수액 또는 처분 결정액',
+                mandatoryBasis: 'consolidated',
                 desc: '지배지분이나 투자 목적으로 타사의 발행 주식을 대량 취득·매각하기로 이사회 결의한 경우입니다.'
             },
             facility_investment: {
@@ -864,6 +732,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '신규 설비 및 시설 투자금액',
+                mandatoryBasis: 'consolidated',
                 desc: '공장 증설, 연구시설 신설, 또는 무형자산성 콘텐츠(게임/음반) 시설외투자를 포괄합니다.'
             },
             bond_deal: {
@@ -877,6 +746,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '사채권 거래/양수 가액',
+                mandatoryBasis: 'consolidated',
                 desc: '전환사채(CB), 신주인수권부사채(BW), 교환사채(EB) 등을 취득하거나 처분하기로 결의할 때입니다.'
             },
             short_loan: {
@@ -890,6 +760,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '증가되는 차입금 규모',
+                mandatoryBasis: 'consolidated',
                 desc: '기존 채무 대환 목적 차입을 제외한 순수 만기 1년 이내의 신규 자금 대출 및 단기회사채 포함입니다.'
             },
             debt_guarantee: {
@@ -903,6 +774,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '담보 제공 한도액 또는 보증액',
+                mandatoryBasis: 'consolidated',
                 desc: '일반적인 영업 활동상 하자보증, 납세보증 등을 제외한 타 법인을 위해 채무 보증하는 건을 지칭합니다.'
             },
             debt_assume_forgive: {
@@ -916,6 +788,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '양수받거나 탕감받은 채무 금액',
+                mandatoryBasis: 'consolidated',
                 desc: '타방의 채무 부채를 떠안거나 거래처 등으로부터 채무를 감면받아 이익이 확인되는 가액입니다.'
             },
             prepayment_loan: {
@@ -929,6 +802,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '대여 또는 가/선급하는 금원',
+                mandatoryBasis: 'consolidated',
                 desc: '타사에 대한 자금 대여, 대규모 가지급금 배정 및 자산 대여 등 자금 유출 건에 대한 판단 기준입니다.'
             },
             disaster_loss: {
@@ -942,6 +816,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생 사실 확인 즉시 신고',
                 inputLabel: '재해 예상 피해가액',
+                mandatoryBasis: 'separate', // Strictly Separate Financial Statement basis under Art 3 Para 7 Item 2
                 desc: '화재, 수해, 천재지변 등의 사고로 인하여 주요 자산의 소실이 인지되었을 때입니다.'
             },
             penalty_fine: {
@@ -955,6 +830,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '부과 처분 통지 도달 당일 18시까지 신고',
                 inputLabel: '고지된 부과금 및 추징총액',
+                mandatoryBasis: 'consolidated',
                 desc: '공정위, 금융위 등 규제 행정기관 또는 사법기관으로부터 거액의 과징금/추징 벌금을 통지받은 경우입니다.'
             },
             deriv_loss: {
@@ -968,7 +844,8 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생 사실 확인 당일 18시까지 신고',
                 inputLabel: '당해 사업연도 파생 누계 손실 규모',
-                desc: '위험 회피용 적격 거래를 배제한 순수 옵션/선물 파생 거래 등에서 발생한 실질/미실현 누적 평가손입니다.'
+                mandatoryBasis: 'consolidated',
+                desc: '위험 회피용 적격 거래를 배제한 전문 파생 상품 거래 등에서 발생한 실질 누적 평가손입니다.'
             },
             impairment_loss: {
                 id: 'impairment_loss',
@@ -981,164 +858,178 @@
                 deadlineType: '당일',
                 deadlineDesc: '사실 확인 당일 18시까지 신고',
                 inputLabel: '누계 차손액 규모',
+                mandatoryBasis: 'separate', // Strictly Separate Financial Statement basis under Art 3 Para 7 Item 2
                 desc: '일반 매출 채권을 제외한 단장기 대여금 등의 대손 충당 및 대손 처리 확정 시의 심사 기준선입니다.'
+            },
+            // --- SUBSIDIARY DISCLOSURES (종속회사 주요경영사항 제8조의2) ---
+            // Under Art 3 Para 7 Item 4, Parent Asset checking under Art 8 Para 1 / Art 16 is STRICTLY based on Separate Financial Statements (별도재무제표)
+            sub_halt: {
+                id: 'sub_halt',
+                category: '종속회사 공시',
+                title: '종속회사의 영업정지 결정 (지배회사 매출액 대비)',
+                regulation: '유가증권시장 공시규정 제8조의2 제1항 제2호',
+                baseType: '매출액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '익일',
+                deadlineDesc: '사실 확인일 다음 날 18시까지 신고',
+                inputLabel: '종속회사 정지영업부문 최근 매출액',
+                mandatoryBasis: 'separate',
+                desc: '종속회사의 정지 영업부문 매출액이 지배회사(더블유게임즈) 최근 연간 매출액의 5% 이상인 경우 해당됩니다.'
+            },
+            sub_capital: {
+                id: 'sub_capital',
+                category: '종속회사 공시',
+                title: '종속회사의 자본금 증감자 결정 (지배회사 자기자본 대비)',
+                regulation: '유가증권시장 공시규정 제8조의2 제1항 제3호',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '익일',
+                deadlineDesc: '사실 확인일 다음 날 18시까지 신고',
+                inputLabel: '종속회사 자본 증감자 가액',
+                mandatoryBasis: 'separate',
+                desc: '종속회사의 유무상증자 또는 감자 결정액이 지배회사 최근 자기자본의 5% 이상인 경우 대상이 됩니다.'
+            },
+            sub_asset_deal: {
+                id: 'sub_asset_deal',
+                category: '종속회사 공시',
+                title: '종속회사의 자산 취득 및 처분 결정 (지배회사 자산총액 대비)',
+                regulation: '유가증권시장 공시규정 제8조의2 제1항 제4호 라목',
+                baseType: '자산총액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '익일',
+                deadlineDesc: '사실 확인일 다음 날 18시까지 신고',
+                inputLabel: '종속회사 취득/처분 대상 자산액',
+                mandatoryBasis: 'separate',
+                desc: '종속회사의 영업양수도 또는 일반 자산 양수도액이 지배회사 자산총액의 5% 이상일 시 적용됩니다.'
+            },
+            sub_cb_eb: {
+                id: 'sub_cb_eb',
+                category: '종속회사 공시',
+                title: '종속회사의 지배회사 주식 교환대상 사채 발행',
+                regulation: '유가증권시장 공시규정 제8조의2 제1항 제5호',
+                baseType: '자기자본',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '익일',
+                deadlineDesc: '사유발생 사실 확인 다음 날 18시까지 신고',
+                inputLabel: '사채 발행 결정 총액',
+                mandatoryBasis: 'separate',
+                desc: '종속회사가 지배회사(더블유게임즈) 주식을 교환대상으로 삼아 전환사채(CB)나 교환사채(EB) 등을 발행하기로 결의한 경우입니다.'
+            },
+            sub_lawsuit: {
+                id: 'sub_lawsuit',
+                category: '종속회사 공시',
+                title: '종속회사에 대한 소송 제기 (지배회사 자산총액 대비)',
+                regulation: '유가증권시장 공시규정 제8조의2 제1항 제6호',
+                baseType: '자산총액',
+                ratioGeneral: 0.05,
+                ratioLarge: 0.025,
+                deadlineType: '익일',
+                deadlineDesc: '소송 피소 사실 확인 다음 날 18시까지 신고',
+                inputLabel: '피소 소송 청구 가액',
+                mandatoryBasis: 'separate',
+                desc: '종속회사를 상대로 제기된 소송의 소송 청구액이 지배회사(더블유게임즈) 최근 자산총액의 5% 이상인 경우입니다.'
+            },
+            sub_merger: {
+                id: 'sub_merger',
+                category: '종속회사 공시',
+                title: '주요종속회사의 합병/분할/구조개편 결정 (자산 10% 기준)',
+                regulation: '유가증권시장 공시규정 제8조의2 제1항 제1호',
+                baseType: '자산총액',
+                ratioGeneral: 0.10,
+                ratioLarge: 0.10,
+                deadlineType: '당일',
+                deadlineDesc: '합병/분할 이사회 결의 당일 18시까지 즉시 신고',
+                inputLabel: '대상 종속회사 자산총액',
+                mandatoryBasis: 'separate',
+                desc: '지배회사(별도 자산총액 기준) 자산의 10% 이상인 종속회사가 합병, 분할 결의를 한 경우 주요종속회사 지위가 획득되어 즉시 공시 의무가 발생합니다.'
             }
         };
 
         // Current App State
-        let currentUnit = 'won'; // 'won' (base KRW) or 'eok' (100 million KRW)
+        let activeStandard = 'consolidated'; // 'consolidated' or 'separate' (Only for Left Panel View)
         let activeCategoryFilter = 'all';
         let selectedItemId = null;
-        
+        let eventAmount = 0; // stored in KRW internally for arithmetic
+
         let financialData = {
             Asset: 0,
             Revenue: 0,
             Equity: 0,
             PaidCapital: 0
         };
-        let eventAmount = 0;
 
         // On Page Load
         window.onload = function() {
-            lucide.createIcons();
+            setStandard('consolidated');
             renderDisclosureList();
             setInitialState();
             calculatePenaltyEstimate();
         };
 
-        // Switch Unit of Input
-        function setUnit(unit) {
-            currentUnit = unit;
+        // Switch Accounting Standard view of (주)더블유게임즈 on the LEFT panel ( 조회용 )
+        function setStandard(standard) {
+            activeStandard = standard;
             
             // Adjust buttons active classes
-            const wonBtn = document.getElementById('unitBtnWon');
-            const eokBtn = document.getElementById('unitBtnEok');
-            if (unit === 'won') {
-                wonBtn.className = "px-3 py-1 rounded text-xs font-semibold transition bg-white text-slate-800 shadow-sm";
-                eokBtn.className = "px-3 py-1 rounded text-xs font-semibold transition text-slate-500 hover:text-slate-800";
-                
-                // Update text indicators
-                document.getElementById('unitLabelAsset').innerText = '원';
-                document.getElementById('unitLabelRevenue').innerText = '원';
-                document.getElementById('unitLabelEquity').innerText = '원';
-                document.getElementById('unitLabelPaidCapital').innerText = '원';
-                document.getElementById('unitLabelEvent').innerText = '원';
-            } else {
-                wonBtn.className = "px-3 py-1 rounded text-xs font-semibold transition text-slate-500 hover:text-slate-800";
-                eokBtn.className = "px-3 py-1 rounded text-xs font-semibold transition bg-white text-slate-800 shadow-sm";
-                
-                document.getElementById('unitLabelAsset').innerText = '억 원';
-                document.getElementById('unitLabelRevenue').innerText = '억 원';
-                document.getElementById('unitLabelEquity').innerText = '억 원';
-                document.getElementById('unitLabelPaidCapital').innerText = '억 원';
-                document.getElementById('unitLabelEvent').innerText = '억 원';
-            }
-
-            // Repopulate Inputs to reflect conversion
-            updateInputFieldsToUnit();
-            updateLabelDisplays();
-            evaluateDisclosureCompliance();
-        }
-
-        // Adjust raw inputs to represent Eok or Won based on toggle
-        function updateInputFieldsToUnit() {
-            const keys = ['Asset', 'Revenue', 'Equity', 'PaidCapital'];
-            keys.forEach(key => {
-                const element = document.getElementById(`input` + key);
-                if (financialData[key] > 0) {
-                    element.value = getDisplayValue(financialData[key]);
-                } else {
-                    element.value = '';
-                }
-            });
-
-            const evInput = document.getElementById('inputEventAmount');
-            if (eventAmount > 0) {
-                evInput.value = getDisplayValue(eventAmount);
-            } else {
-                evInput.value = '';
-            }
-        }
-
-        // Helper to scale raw value to view value
-        function getDisplayValue(rawValue) {
-            if (currentUnit === 'eok') {
-                return (rawValue / 100000000).toString();
-            }
-            return rawValue.toLocaleString();
-        }
-
-        // Handle numeric inputs for financial metrics
-        function handleFinancialInput(metricKey, rawStr) {
-            let numericValue = parseInputValue(rawStr);
-            financialData[metricKey] = numericValue;
+            const consBtn = document.getElementById('standardBtnCons');
+            const sepBtn = document.getElementById('standardBtnSep');
             
-            // Auto update display strings
-            updateLabelDisplays();
+            if (standard === 'consolidated') {
+                consBtn.className = "px-2.5 py-1.5 rounded text-xs font-bold transition bg-white text-slate-800 shadow-sm flex items-center gap-1";
+                sepBtn.className = "px-2.5 py-1.5 rounded text-xs font-bold transition text-slate-500 hover:text-slate-800 flex items-center gap-1";
+            } else {
+                consBtn.className = "px-2.5 py-1.5 rounded text-xs font-bold transition text-slate-500 hover:text-slate-800 flex items-center gap-1";
+                sepBtn.className = "px-2.5 py-1.5 rounded text-xs font-bold transition bg-white text-slate-800 shadow-sm flex items-center gap-1";
+            }
+
+            // Sync left panel display values based on selected view tab
+            financialData.Asset = AUDITED_REPORTS[standard].Asset;
+            financialData.Revenue = AUDITED_REPORTS[standard].Revenue;
+            financialData.Equity = AUDITED_REPORTS[standard].Equity;
+            financialData.PaidCapital = AUDITED_REPORTS[standard].PaidCapital;
+
+            // Update display fields
+            document.getElementById('displayAsset').innerText = formatToEok(financialData.Asset);
+            document.getElementById('displayRevenue').innerText = formatToEok(financialData.Revenue);
+            document.getElementById('displayEquity').innerText = formatToEok(financialData.Equity);
+            document.getElementById('displayPaidCapital').innerText = formatToEok(financialData.PaidCapital);
+
             evaluateDisclosureCompliance();
         }
 
         // Handle transaction event amount input
         function handleEventAmountInput(rawStr) {
-            let numericValue = parseInputValue(rawStr);
-            eventAmount = numericValue;
-            
-            updateLabelDisplays();
-            evaluateDisclosureCompliance();
-        }
-
-        // Parse user input strings with comma or decimal
-        function parseInputValue(str) {
-            let clean = str.replace(/[^0-9.]/g, '');
+            let clean = rawStr.replace(/[^0-9.]/g, '');
             let val = parseFloat(clean);
-            if (isNaN(val) || val <= 0) return 0;
-
-            if (currentUnit === 'eok') {
-                return val * 100000000; // Scale 1 Eok to 100,000,000 Won
-            }
-            return val;
-        }
-
-        // Quick incremental value adder buttons
-        function addFinancialValue(metricKey, eokDelta) {
-            let delta = eokDelta * 100000000;
-            financialData[metricKey] += delta;
-
-            const inputEl = document.getElementById(`input` + metricKey);
-            inputEl.value = getDisplayValue(financialData[metricKey]);
-
-            updateLabelDisplays();
+            if (isNaN(val) || val <= 0) val = 0;
+            
+            eventAmount = val * 100000000; // Translate 1 Eok to 100,000,000 Won internally
+            document.getElementById('labelEventAmountKrw').innerText = formatKoreanWord(eventAmount);
             evaluateDisclosureCompliance();
         }
 
         // Quick incremental value for Event amount
         function addEventValue(eokDelta) {
-            let delta = eokDelta * 100000000;
-            eventAmount += delta;
+            let currentEok = eventAmount / 100000000;
+            let targetEok = currentEok + eokDelta;
 
             const inputEl = document.getElementById('inputEventAmount');
-            inputEl.value = getDisplayValue(eventAmount);
+            inputEl.value = targetEok;
 
-            updateLabelDisplays();
+            eventAmount = targetEok * 100000000;
+            document.getElementById('labelEventAmountKrw').innerText = formatKoreanWord(eventAmount);
             evaluateDisclosureCompliance();
         }
 
-        // Translate financial baseline raw numbers to detailed Korean Words
-        function updateLabelDisplays() {
-            document.getElementById('labelAssetKrw').innerText = formatKoreanWord(financialData.Asset);
-            document.getElementById('labelRevenueKrw').innerText = formatKoreanWord(financialData.Revenue);
-            document.getElementById('labelEquityKrw').innerText = formatKoreanWord(financialData.Equity);
-            document.getElementById('labelPaidCapitalKrw').innerText = formatKoreanWord(financialData.PaidCapital);
-            document.getElementById('labelEventAmountKrw').innerText = formatKoreanWord(eventAmount);
-
-            // Paid-in Capital adjustment rule (Article 3, Paragraph 5)
-            const adjustBanner = document.getElementById('adjustedEquityBanner');
-            if (financialData.Equity > 0 && financialData.PaidCapital > 0 && financialData.Equity < financialData.PaidCapital) {
-                adjustBanner.classList.remove('hidden');
-                document.getElementById('adjustedEquityVal').innerText = formatKoreanWord(financialData.PaidCapital);
-            } else {
-                adjustBanner.classList.add('hidden');
-            }
+        // Formatter into Eok Per User Request: outputs clean formatted eok (e.g. 18,478.6억 원)
+        function formatToEok(value) {
+            if (!value || isNaN(value) || value <= 0) return '0.0억 원';
+            const eokVal = value / 100000000;
+            return eokVal.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '억 원';
         }
 
         // Korean Word Converter (e.g., 2500000000000 -> 2조 5,000억 원)
@@ -1204,8 +1095,8 @@
             activeCategoryFilter = category;
             
             // Adjust buttons classes
-            const chips = ['all', '영업 및 생산활동', '투자 및 자산 활동', '채무 및 재무 구조', '손실 및 재해'];
-            const names = ['all', '영업', '투자', '채무', '손실'];
+            const chips = ['all', '영업 및 생산활동', '투자 및 자산 활동', '채무 및 재무 구조', '손실 및 재해', '종속회사 공시'];
+            const names = ['all', '영업', '투자', '채무', '손실', '종속'];
             
             chips.forEach((c, idx) => {
                 const btn = document.getElementById(`catBtn_` + names[idx]);
@@ -1261,8 +1152,45 @@
             document.getElementById('resultAnalysisArea').classList.remove('hidden');
             document.getElementById('printReportArea').classList.remove('hidden');
 
+            let resolvedAsset, resolvedRevenue, resolvedEquity, resolvedPaidCapital;
+            let isMandatorySeparate = false;
+
+            // CRITICAL DOMAIN RULE:
+            // Check if the disclosure legally mandates Separate (별도) Financial statement numbers as the benchmark
+            if (item.mandatoryBasis === 'separate') {
+                resolvedAsset = AUDITED_REPORTS.separate.Asset;
+                resolvedRevenue = AUDITED_REPORTS.separate.Revenue;
+                resolvedEquity = AUDITED_REPORTS.separate.Equity;
+                resolvedPaidCapital = AUDITED_REPORTS.separate.PaidCapital;
+                isMandatorySeparate = true;
+            } else {
+                // Otherwise, legally defaults to Consolidated (연결)
+                resolvedAsset = AUDITED_REPORTS.consolidated.Asset;
+                resolvedRevenue = AUDITED_REPORTS.consolidated.Revenue;
+                resolvedEquity = AUDITED_REPORTS.consolidated.Equity;
+                resolvedPaidCapital = AUDITED_REPORTS.consolidated.PaidCapital;
+            }
+
+            // Toggle regulatory separate statement banner with high-fidelity description
+            const mandateBanner = document.getElementById('separateMandateBanner');
+            const mandateTitle = document.getElementById('separateMandateTitle');
+            const mandateDesc = document.getElementById('separateMandateDesc');
+
+            if (isMandatorySeparate) {
+                mandateBanner.classList.remove('hidden');
+                if (item.category === '종속회사 공시') {
+                    mandateTitle.innerText = "종속회사 공시의 별도기준 적용 (공시규정 제3조 제7항 제4호)";
+                    mandateDesc.innerHTML = "공시규정 제8조 및 제16조에 따른 자회사(종속회사)의 수시공시 의무 판단 시 지배회사(더블유게임즈)의 기준 한도는 <strong>지배기업의 별도재무제표 자산총액 및 수치</strong>를 기준으로 산정하도록 법으로 명시되어 있습니다.";
+                } else {
+                    mandateTitle.innerText = "별도 재무제표 의무 적용 대상 (공시규정 제3조 제7항 제2호)";
+                    mandateDesc.innerHTML = `<strong>${item.title}</strong> 등 특정 재무적 영향 유형은 지배회사 자체 공시 기준선 검토 시 연결이 아닌 <strong>별도재무제표</strong> 수치를 기준으로 한도를 산정하도록 법으로 명시되어 있습니다.`;
+                }
+            } else {
+                mandateBanner.classList.add('hidden');
+            }
+
             // 1. Determine Company Classification (Large vs General)
-            const isLargeCorp = financialData.Asset >= 2000000000000; // 2 Trillion Won threshold
+            const isLargeCorp = resolvedAsset >= 2000000000000; // 2 Trillion Won threshold
             const badge = document.getElementById('corpBadge');
             
             if (isLargeCorp) {
@@ -1273,36 +1201,49 @@
                 badge.className = "inline-flex items-center bg-slate-50 text-slate-700 text-xs font-bold px-3 py-1 rounded-full border border-slate-200 shadow-sm whitespace-nowrap";
             }
 
-            // 2. Adjust Equity baseline if capital adjustment rule applies
-            let baseEquity = financialData.Equity;
-            if (financialData.PaidCapital > 0 && financialData.Equity < financialData.PaidCapital) {
-                baseEquity = financialData.PaidCapital; // Use paid-in capital instead of negative or minor equity
+            // 2. Adjust Equity baseline if capital adjustment rule applies (Article 3, Paragraph 5)
+            let baseEquity = resolvedEquity;
+            if (resolvedPaidCapital > 0 && resolvedEquity < resolvedPaidCapital) {
+                baseEquity = resolvedPaidCapital; // Use paid-in capital instead of negative or minor equity
             }
 
             // 3. Resolve base parameter value for calculations
             let baseParamValue = 0;
-            if (item.baseType === '매출액') baseParamValue = financialData.Revenue;
-            else if (item.baseType === '자산총액') baseParamValue = financialData.Asset;
+            if (item.baseType === '매출액') baseParamValue = resolvedRevenue;
+            else if (item.baseType === '자산총액') baseParamValue = resolvedAsset;
             else if (item.baseType === '자기자본') baseParamValue = baseEquity;
 
             // 4. Compute regulatory triggers and thresholds
             const appliedRatio = isLargeCorp ? item.ratioLarge : item.ratioGeneral;
-            const minimumTriggerValue = baseParamValue * appliedRatio;
+            let minimumTriggerValue = baseParamValue * appliedRatio;
+
+            // Special case: sub_merger is a major subsidiary structural change, which check if the target's asset size is >= 10% of Parent separate assets
+            if (item.id === 'sub_merger') {
+                minimumTriggerValue = baseParamValue * 0.10; // 10% threshold of Parent Separate assets (approx 779억 원)
+            }
 
             // Check if triggers are zero (means base parameter hasn't been input)
             const isBaseDataMissing = baseParamValue <= 0;
 
             // Check compliance obligation
-            const isObligated = eventAmount >= minimumTriggerValue && !isBaseDataMissing && eventAmount > 0;
+            let isObligated = false;
+            if (item.id === 'sub_merger') {
+                // If entered amount (subsidiary assets) >= 10% of parent's separate assets, it is a Major Subsidiary (의무발생)
+                isObligated = eventAmount >= minimumTriggerValue && eventAmount > 0;
+            } else {
+                isObligated = eventAmount >= minimumTriggerValue && !isBaseDataMissing && eventAmount > 0;
+            }
 
             // Fill Analysis Area Data
             document.getElementById('selectedDisclosureTitle').innerText = item.title;
-            document.getElementById('selectedDisclosureCategory').innerText = `${item.category} • ${item.regulation}`;
+            
+            const standardLabel = isMandatorySeparate ? "별도재무제표 의무적용" : "연결재무제표 기본적용";
+            document.getElementById('selectedDisclosureCategory').innerText = `${item.category} • ${item.regulation} [법정 적용기준: ${standardLabel}]`;
 
-            document.getElementById('calcBaseType').innerText = item.baseType;
+            document.getElementById('calcBaseType').innerText = isMandatorySeparate ? `${item.baseType} (별도 의무)` : `${item.baseType} (연결 의무)`;
             document.getElementById('calcBaseValue').innerText = formatKoreanWord(baseParamValue);
-            document.getElementById('calcRequiredRatio').innerText = `${(appliedRatio * 100).toFixed(1)}%`;
-            document.getElementById('calcMinTriggerAmount').innerText = isBaseDataMissing ? '기초자료 누락' : formatKoreanWord(minimumTriggerValue);
+            document.getElementById('calcRequiredRatio').innerText = item.id === 'sub_merger' ? '지배회사 별도 자산의 10% 이상' : `${(appliedRatio * 100).toFixed(1)}%`;
+            document.getElementById('calcMinTriggerAmount').innerText = isBaseDataMissing ? '기초자료 누락' : (item.id === 'sub_merger' ? `주요종속회사 기준선: ${formatKoreanWord(minimumTriggerValue)}` : formatKoreanWord(minimumTriggerValue));
             document.getElementById('calcActualValue').innerText = formatKoreanWord(eventAmount);
 
             // Progress Circular Meter update
@@ -1321,7 +1262,7 @@
             // Adjust Meter Colors
             if (reachPercentage >= 100) {
                 progressCircle.setAttribute('stroke', '#C0392B'); // Danger Red
-                document.getElementById('gaugeStatusText').innerText = "의무 발생 (초과)";
+                document.getElementById('gaugeStatusText').innerText = item.id === 'sub_merger' ? "주요종속회사 해당 (의무발생)" : "의무 발생 (초과)";
                 document.getElementById('gaugeStatusText').className = "text-xs font-bold mt-2 text-rose-600 animate-pulse";
             } else if (reachPercentage >= 80) {
                 progressCircle.setAttribute('stroke', '#F39C12'); // Amber Warnings
@@ -1329,11 +1270,11 @@
                 document.getElementById('gaugeStatusText').className = "text-xs font-bold mt-2 text-amber-500";
             } else {
                 progressCircle.setAttribute('stroke', '#114E9E'); // Normal Blue
-                document.getElementById('gaugeStatusText').innerText = "안정 권역";
+                document.getElementById('gaugeStatusText').innerText = item.id === 'sub_merger' ? "일반종속회사 범위" : "안정 권역";
                 document.getElementById('gaugeStatusText').className = "text-xs font-bold mt-2 text-slate-500";
             }
 
-            // Diagnostic Banner Injections
+            // Diagnostic Verdict Banners
             const verdictBanner = document.getElementById('verdictBanner');
             const verdictIconBox = document.getElementById('verdictIconBox');
             const verdictHeadline = document.getElementById('verdictHeadline');
@@ -1345,7 +1286,7 @@
                 verdictIconBox.className = "p-3 rounded-xl bg-slate-200 text-slate-600";
                 verdictIconBox.innerHTML = `<i data-lucide="info" class="w-6 h-6"></i>`;
                 verdictHeadline.innerText = "기초 재무정보 확인 필요";
-                verdictMessage.innerText = `판단 기준이 되는 회사 재무 정보(${item.baseType})가 공란이거나 0원입니다. 왼쪽 상단 폼에 재무 기초 수치를 기재해 주십시오.`;
+                verdictMessage.innerText = `판단 기준이 되는 회사 재무 정보(${item.baseType})가 공란이거나 0원입니다.`;
                 pulseBg.className = "absolute inset-0 bg-slate-50 transition-colors duration-500 -z-10";
             } else if (eventAmount <= 0) {
                 verdictBanner.className = "p-5 rounded-2xl flex items-start gap-4 transition-all duration-300 bg-slate-100 border border-slate-200 text-slate-700";
@@ -1358,15 +1299,26 @@
                 verdictBanner.className = "p-5 rounded-2xl flex items-start gap-4 transition-all duration-300 bg-rose-50 border border-rose-200 text-rose-900";
                 verdictIconBox.className = "p-3 rounded-xl bg-rose-500 text-white";
                 verdictIconBox.innerHTML = `<i data-lucide="alert-octagon" class="w-6 h-6 animate-ping"></i>`;
-                verdictHeadline.innerText = "⚠️ 주요경영사항 의무 공시 대상";
-                verdictMessage.innerText = `거래 금액(${formatKoreanWord(eventAmount)})이 법정 공시 기준선(${formatKoreanWord(minimumTriggerValue)})을 초과하였습니다. 즉각적인 공시 준비 및 이사회 의결 확인이 권고됩니다.`;
+                
+                if (item.id === 'sub_merger') {
+                    verdictHeadline.innerText = "⚠️ 주요종속회사 지배구조 변동공시 대상";
+                    verdictMessage.innerText = `입력한 종속회사 자산규모(${formatKoreanWord(eventAmount)})가 지배회사 별도 자산총액의 10% 기준선(${formatKoreanWord(minimumTriggerValue)})을 초과하여 주요종속회사에 준하는 즉시 공시 의무가 성립됩니다.`;
+                } else {
+                    verdictHeadline.innerText = "⚠️ 주요경영사항 의무 공시 대상";
+                    verdictMessage.innerText = `거래 금액(${formatKoreanWord(eventAmount)})이 법정 공시 기준선(${formatKoreanWord(minimumTriggerValue)})을 초과하였습니다. 즉각적인 공시 준비 및 이사회 의결 확인이 권고됩니다.`;
+                }
                 pulseBg.className = "absolute inset-0 bg-rose-50/50 transition-colors duration-500 -z-10";
             } else {
                 verdictBanner.className = "p-5 rounded-2xl flex items-start gap-4 transition-all duration-300 bg-emerald-50 border border-emerald-200 text-emerald-950";
                 verdictIconBox.className = "p-3 rounded-xl bg-emerald-500 text-white";
                 verdictIconBox.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i>`;
                 verdictHeadline.innerText = "의무 공시 미해당 (공시의무 없음)";
-                verdictMessage.innerText = `거래 금액이 기준선 미만입니다. 법적 공시 의무는 없으나, 투자 판단에 중대한 영향을 준다고 자체 판단될 시 자율공시(규정 제28조) 여부를 실무 검토할 수 있습니다.`;
+                
+                if (item.id === 'sub_merger') {
+                    verdictMessage.innerText = `대상 종속회사의 규모가 지배회사 별도 자산총액의 10% 기준선(${formatKoreanWord(minimumTriggerValue)})에 미달하여 주요종속회사 변동 공시 의무는 성립되지 않습니다.`;
+                } else {
+                    verdictMessage.innerText = `거래 금액이 기준선 미만입니다. 법적 공시 의무는 없으나, 투자 판단에 중요한 영향을 준다고 판단될 시 자율공시(규정 제28조) 여부를 실무 검토할 수 있습니다.`;
+                }
                 pulseBg.className = "absolute inset-0 bg-emerald-50/30 transition-colors duration-500 -z-10";
             }
 
@@ -1384,24 +1336,33 @@
             `;
 
             // Update printable report data
-            updatePrintableReport(item, isLargeCorp, isObligated, minimumTriggerValue, appliedRatio, baseParamValue);
+            updatePrintableReport(item, isLargeCorp, isObligated, minimumTriggerValue, appliedRatio, baseParamValue, isMandatorySeparate);
             lucide.createIcons();
         }
 
         // Fill data for the printable PDF card
-        function updatePrintableReport(item, isLargeCorp, isObligated, triggerVal, ratio, baseVal) {
+        function updatePrintableReport(item, isLargeCorp, isObligated, triggerVal, ratio, baseVal, isMandatorySeparate) {
             document.getElementById('printCorpScale').innerText = isLargeCorp ? '대규모법인 (자산 2조 원 이상)' : '일반 유가증권 상장법인';
             document.getElementById('printVerdictStatus').innerText = isObligated ? '의무 대상' : '의무 면제';
             
-            document.getElementById('printAsset').innerText = formatKoreanWord(financialData.Asset);
-            document.getElementById('printRevenue').innerText = formatKoreanWord(financialData.Revenue);
-            document.getElementById('printEquity').innerText = formatKoreanWord(financialData.Equity);
-            document.getElementById('printPaidCapital').innerText = formatKoreanWord(financialData.PaidCapital);
+            // Set applicable accounting standard text
+            const standardText = isMandatorySeparate 
+                ? "별도 재무제표 기준 (공시규정 제3조 제7항 의무)" 
+                : "연결 재무제표 기준 (지배회사 연결 기본적용)";
+            document.getElementById('printAccountingStandard').innerText = standardText;
+
+            // Format printable report BASE metrics to 100 Million KRW (억원) per user request
+            // Note: Legally correct figures are displayed here (Consolidated for general, Separate for disaster/impairment/subsidiary)
+            const targetAuditedReport = isMandatorySeparate ? AUDITED_REPORTS.separate : AUDITED_REPORTS.consolidated;
+            document.getElementById('printAsset').innerText = formatToEok(targetAuditedReport.Asset);
+            document.getElementById('printRevenue').innerText = formatToEok(targetAuditedReport.Revenue);
+            document.getElementById('printEquity').innerText = formatToEok(targetAuditedReport.Equity);
+            document.getElementById('printPaidCapital').innerText = formatToEok(targetAuditedReport.PaidCapital);
 
             document.getElementById('printDisclosureTitle').innerText = item.title;
             document.getElementById('printRuleCitation').innerText = item.regulation;
             document.getElementById('printActualValue').innerText = formatKoreanWord(eventAmount);
-            document.getElementById('printTriggerValue').innerText = `${formatKoreanWord(triggerVal)} (${item.baseType}의 ${(ratio * 100).toFixed(1)}%)`;
+            document.getElementById('printTriggerValue').innerText = item.id === 'sub_merger' ? `지배회사 별도 자산 10% 주요종속회사 기준선: ${formatKoreanWord(triggerVal)}` : `${formatKoreanWord(triggerVal)} (${item.baseType}의 ${(ratio * 100).toFixed(1)}%)`;
             document.getElementById('printDeadline').innerText = item.deadlineDesc;
 
             const verdictResult = document.getElementById('printVerdictResult');
@@ -1411,15 +1372,15 @@
                 verdictResult.innerText = "★ 법정 공시 의무 대상 (의무 발생)";
                 verdictResult.style.color = '#C0392B';
                 opinionBox.innerHTML = `
-                    <p>위 상장법인의 <strong>${item.title}</strong> 자가 실무 심사 결과, 검토 대상 거래 금액(${formatKoreanWord(eventAmount)})이 법정 기준선인 <strong>${formatKoreanWord(triggerVal)}</strong>을 초과하여 공시규정 제7조 제1항에 의거한 <strong>주요경영사항 의무 공시 대상으로 판정</strong>됩니다.</p>
-                    <p class="mt-2">실무팀은 이사회 결의 및 계약 체결 등 의결 요건 성립 시점으로부터 <strong>${item.deadlineDesc}</strong> 이내에 한국거래소 전자공시시스템(KIND)을 통한 의무 신고 절차를 지체 없이 속개하여 주시기 바랍니다. 공시 기재 오류 및 누락 시 불성실공시 지정 등의 불이익이 발생할 수 있으므로, 최종 문안 제출 전 사외이사 참석 현황 등 검증 필수 조치를 권고합니다.</p>
+                    <p class="mb-2">위 상장법인의 <strong>${item.title}</strong> 자가 실무 심사 결과, 검토 대상 거래 금액(${formatKoreanWord(eventAmount)})이 법정 기준선인 <strong>${item.id === 'sub_merger' ? '지배회사 별도 자산 10% 주요종속회사 기준선' : formatKoreanWord(triggerVal)}</strong>을 초과하여 공시규정 제7조 또는 제8조의2에 의거한 <strong>주요경영사항 의무 공시 대상으로 판정</strong>됩니다.</p>
+                    <p>검토 결과에 따라 이사회 결의 및 계약 체결 등 의결 요건 성립 시점으로부터 <strong>${item.deadlineDesc}</strong> 이내에 한국거래소 전자공시시스템(KIND)을 통한 의무 신고 절차를 지체 없이 속개하여 주시기 바랍니다.</p>
                 `;
             } else {
                 verdictResult.innerText = "공시 의무 미해당 (자율 검토 대상)";
                 verdictResult.style.color = '#27AE60';
                 opinionBox.innerHTML = `
-                    <p>위 상장법인의 <strong>${item.title}</strong> 자가 실무 심사 결과, 검토 대상 거래 가액이 규정상 trigger 임계치에 도달하지 아니하여 <strong>법적 강제 공시 의무는 발생하지 않는 것으로 판정</strong>됩니다.</p>
-                    <p class="mt-2">다만, 공시의무는 면제되나 당해 사건이 향후 투자자의 판단 영역 및 주가 변동성에 지대한 파급효과가 예상된다고 이사회 등에서 판단할 시, 규정 제28조 및 시행세칙 제8조 제20호에 맞춰 <strong>'자율공시'</strong>를 통한 정보 투명성 제고 방안을 적극 검토할 수 있습니다.</p>
+                    <p class="mb-2">위 상장법인의 <strong>${item.title}</strong> 자가 실무 심사 결과, 검토 대상 거래 가액이 규정상 trigger 임계치에 도달하지 아니하여 <strong>법적 강제 공시 의무는 발생하지 않는 것으로 판정</strong>됩니다.</p>
+                    <p>다만, 공시의무는 면제되나 당해 사건이 향후 투자자의 판단 영역 및 주가 변동성에 지대한 파급효과가 예상된다고 이사회 등에서 판단할 시, 규정 제28조 및 시행세칙 제8조 제20호에 맞춰 <strong>'자율공시'</strong>를 통한 정보 투명성 제고 방안을 적극 검토할 수 있으며, 검토 결과에 따라 이사회 결의 및 자율공시 신고서 제출 등의 의결 요건 성립 시점으로부터 법정 절차를 지체 없이 속개하여 주시기 바랍니다.</p>
                 `;
             }
         }
@@ -1498,280 +1459,6 @@
             document.getElementById('estPoints').innerText = `${basePoints}점`;
             document.getElementById('estPointsDetails').innerText = `원인 범위: ${rangeDetails}`;
             document.getElementById('estFines').innerText = additionalFine;
-        }
-
-        // --- NEW IMPORTER FEATURE SCRIPTS ---
-        
-        // Collapsible toggle for Importer Widget
-        function toggleImporter() {
-            const content = document.getElementById('importerContent');
-            const chevron = document.getElementById('importerChevron');
-            if (content.classList.contains('hidden')) {
-                content.classList.remove('hidden');
-                chevron.style.transform = "rotate(180deg)";
-            } else {
-                content.classList.add('hidden');
-                chevron.style.transform = "rotate(0deg)";
-            }
-        }
-
-        // Direct DoubleUGames Preset Injection
-        function loadDoubleUFiles(mode) {
-            // Dec 31, 2025 Consolidated vs Separate details from DART
-            if (mode === 'consolidated') {
-                financialData.Asset = 1847862000000;
-                financialData.Revenue = 719897000000;
-                financialData.Equity = 1652363000000;
-                financialData.PaidCapital = 10840000000;
-            } else {
-                financialData.Asset = 778969000000;
-                financialData.Revenue = 175381000000;
-                financialData.Equity = 730479000000;
-                financialData.PaidCapital = 10840000000;
-            }
-
-            // Update UI
-            updateInputFieldsToUnit();
-            updateLabelDisplays();
-            evaluateDisclosureCompliance();
-
-            // Notify User
-            const feedbackEl = document.getElementById('importFeedback');
-            feedbackEl.classList.remove('hidden');
-            feedbackEl.className = "p-3 text-xs rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 space-y-1.5";
-            const modeName = mode === 'consolidated' ? '연결' : '별도';
-            
-            feedbackEl.innerHTML = `
-                <div class="flex items-center gap-1.5 font-bold">
-                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-                    <span>더블유게임즈 2025년 ${modeName} 결산 완료!</span>
-                </div>
-                <ul class="list-disc pl-4 space-y-0.5 font-medium">
-                    <li>자산총계: ${formatKoreanWord(financialData.Asset)}</li>
-                    <li>매출액: ${formatKoreanWord(financialData.Revenue)}</li>
-                    <li>자기자본: ${formatKoreanWord(financialData.Equity)}</li>
-                    <li>자본금: ${formatKoreanWord(financialData.PaidCapital)}</li>
-                </ul>
-                <p class="text-[10px] text-emerald-600 font-semibold pt-1">최근 사업보고서 재무정보가 안정적으로 주입되었습니다.</p>
-            `;
-            lucide.createIcons();
-        }
-
-        // Drag & Drop / File Select File reading
-        function handleFileSelect(event) {
-            const file = event.target.files[0];
-            if (file) readAndLoadText(file);
-        }
-
-        function handleFileDrop(event) {
-            event.preventDefault();
-            document.getElementById('dropZone').classList.remove('border-krx-blue', 'bg-slate-50');
-            const file = event.dataTransfer.files[0];
-            if (file) readAndLoadText(file);
-        }
-
-        function handleDragOver(event) {
-            event.preventDefault();
-            document.getElementById('dropZone').classList.add('border-krx-blue', 'bg-slate-50');
-        }
-
-        function handleDragLeave() {
-            document.getElementById('dropZone').classList.remove('border-krx-blue', 'bg-slate-50');
-        }
-
-        function readAndLoadText(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                document.getElementById('pasteArea').value = text;
-                
-                // Show successfully loaded file message
-                const feedbackEl = document.getElementById('importFeedback');
-                feedbackEl.classList.remove('hidden');
-                feedbackEl.className = "p-3 text-xs rounded-xl border bg-blue-50 border-blue-200 text-blue-800";
-                feedbackEl.innerHTML = `
-                    <div class="flex items-center gap-1.5 font-bold">
-                        <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i>
-                        <span>텍스트 파일 로드 완료 (${file.name})</span>
-                    </div>
-                    <p class="text-[10px] text-blue-600 mt-1">파일의 텍스트가 아래 붙여넣기 란에 채워졌습니다. '파싱 및 적용' 버튼을 눌러 확정해 주십시오.</p>
-                `;
-                lucide.createIcons();
-            };
-            reader.readAsText(file);
-        }
-
-        // Smart Regex Parser for Financial reports from DART
-        function parseAndApplyText() {
-            const text = document.getElementById('pasteArea').value;
-            const feedbackEl = document.getElementById('importFeedback');
-            
-            if (!text.trim()) {
-                feedbackEl.classList.remove('hidden');
-                feedbackEl.className = "p-3 text-xs rounded-xl border bg-rose-50 border-rose-200 text-rose-800 flex items-start gap-2";
-                feedbackEl.innerHTML = `
-                    <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5"></i>
-                    <div>
-                        <p class="font-bold">입력된 텍스트가 없습니다.</p>
-                        <p class="text-[10px] text-rose-600 mt-0.5">보고서 내용을 복사하여 붙여넣거나 파일을 업로드해 주세요.</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            // Let's check if the text is JSON format
-            let parsedData = { Asset: null, Revenue: null, Equity: null, PaidCapital: null };
-            let isJson = false;
-            try {
-                const jsonObj = JSON.parse(text);
-                if (jsonObj) {
-                    parsedData.Asset = jsonObj.Asset || jsonObj.asset || null;
-                    parsedData.Revenue = jsonObj.Revenue || jsonObj.revenue || null;
-                    parsedData.Equity = jsonObj.Equity || jsonObj.equity || null;
-                    parsedData.PaidCapital = jsonObj.PaidCapital || jsonObj.paidCapital || jsonObj.paid_capital || null;
-                    isJson = true;
-                }
-            } catch (e) {
-                // Not JSON, treat as text
-            }
-
-            if (!isJson) {
-                // Text-based Keyword Regex Engine
-                const lines = text.split('\n');
-                
-                // Regex cleaner for numerals (converts multiple separators like '1.847.862' or '1,847,862' safely)
-                function cleanNumberStr(str) {
-                    let clean = str.replace(/[^0-9.,]/g, '');
-                    const periods = (clean.match(/\./g) || []).length;
-                    const commas = (clean.match(/,/g) || []).length;
-                    
-                    if (periods > 1) clean = clean.replace(/\./g, '');
-                    if (commas > 0) clean = clean.replace(/,/g, '');
-                    if (periods === 1 && commas === 0) {
-                        const parts = clean.split('.');
-                        if (parts[1].length === 3) clean = clean.replace(/\./g, '');
-                    }
-                    
-                    let val = parseFloat(clean);
-                    return isNaN(val) ? null : val;
-                }
-
-                function findFirstNumAfter(line, keywordIdx) {
-                    const sub = line.substring(keywordIdx);
-                    const numMatches = sub.match(/[\d,.]+/g);
-                    if (!numMatches) return null;
-                    for (let match of numMatches) {
-                        let parsed = cleanNumberStr(match);
-                        if (parsed && parsed > 10) return parsed;
-                    }
-                    return null;
-                }
-
-                lines.forEach(line => {
-                    const compact = line.replace(/\s+/g, '');
-                    
-                    // Asset Check
-                    if (compact.includes('자산총계') || compact.includes('자산총액') || compact.includes('자산의합계')) {
-                        const idx = line.indexOf('자산');
-                        const num = findFirstNumAfter(line, idx);
-                        if (num && !parsedData.Asset) parsedData.Asset = num;
-                    }
-                    // Revenue Check
-                    if (compact.includes('매출액') || compact.includes('영업수익') || compact.includes('매출액계')) {
-                        const idx = line.indexOf('매출') >= 0 ? line.indexOf('매출') : line.indexOf('영업');
-                        const num = findFirstNumAfter(line, idx);
-                        if (num && !parsedData.Revenue) parsedData.Revenue = num;
-                    }
-                    // Equity Check
-                    if (compact.includes('자본총계') || compact.includes('자기자본') || compact.includes('자본의합계') || compact.includes('자본총액')) {
-                        const idx = line.indexOf('자본') >= 0 ? line.indexOf('자본') : line.indexOf('자기');
-                        const num = findFirstNumAfter(line, idx);
-                        if (num && !parsedData.Equity) parsedData.Equity = num;
-                    }
-                    // Paid Capital Check
-                    if (compact.includes('자본금') || compact.includes('납입자본금')) {
-                        const idx = line.indexOf('자본');
-                        const num = findFirstNumAfter(line, idx);
-                        if (num && !parsedData.PaidCapital) parsedData.PaidCapital = num;
-                    }
-                });
-            }
-
-            // Multiplier Scaler Evaluation
-            let multiplier = 1;
-            const chosenUnit = document.getElementById('importUnitSelect').value;
-            
-            if (chosenUnit === 'auto') {
-                // Failsafe auto-scale heuristic
-                if (parsedData.Asset) {
-                    if (parsedData.Asset < 10000) {
-                        multiplier = 100000000; // in 100 million KRW (억원)
-                    } else if (parsedData.Asset < 10000000) {
-                        multiplier = 1000000;   // in millions KRW (백만원 - DART default)
-                    } else if (parsedData.Asset < 10000000000) {
-                        multiplier = 1000;      // in thousands KRW (천원)
-                    }
-                }
-            } else {
-                multiplier = parseInt(chosenUnit);
-            }
-
-            // Apply scaled values to app state if detected
-            let appliedFields = [];
-            if (parsedData.Asset) {
-                financialData.Asset = parsedData.Asset * multiplier;
-                appliedFields.push(`자산총계 (${formatKoreanWord(financialData.Asset)})`);
-            }
-            if (parsedData.Revenue) {
-                financialData.Revenue = parsedData.Revenue * multiplier;
-                appliedFields.push(`매출액 (${formatKoreanWord(financialData.Revenue)})`);
-            }
-            if (parsedData.Equity) {
-                financialData.Equity = parsedData.Equity * multiplier;
-                appliedFields.push(`자기자본 (${formatKoreanWord(financialData.Equity)})`);
-            }
-            if (parsedData.PaidCapital) {
-                financialData.PaidCapital = parsedData.PaidCapital * multiplier;
-                appliedFields.push(`자본금 (${formatKoreanWord(financialData.PaidCapital)})`);
-            }
-
-            // Show feedback depending on output
-            feedbackEl.classList.remove('hidden');
-            if (appliedFields.length > 0) {
-                feedbackEl.className = "p-3 text-xs rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 space-y-1.5";
-                
-                let unitName = "원(KRW)";
-                if (multiplier === 1000) unitName = "천 원";
-                if (multiplier === 1000000) unitName = "백만 원";
-                if (multiplier === 100000000) unitName = "억 원";
-                
-                feedbackEl.innerHTML = `
-                    <div class="flex items-center gap-1.5 font-bold">
-                        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
-                        <span>재무 데이터 파싱 완료! (배율단위: ${unitName})</span>
-                    </div>
-                    <ul class="list-disc pl-4 space-y-0.5 font-semibold">
-                        ${appliedFields.map(f => `<li>${f}</li>`).join('')}
-                    </ul>
-                    <p class="text-[10px] text-emerald-600 font-bold pt-1">파싱된 재무정보가 기본정보에 자동 매핑되었습니다.</p>
-                `;
-
-                // Update input forms
-                updateInputFieldsToUnit();
-                updateLabelDisplays();
-                evaluateDisclosureCompliance();
-            } else {
-                feedbackEl.className = "p-3 text-xs rounded-xl border bg-amber-50 border-amber-200 text-amber-800 flex items-start gap-2";
-                feedbackEl.innerHTML = `
-                    <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
-                    <div>
-                        <p class="font-bold">키워드 인식 실패</p>
-                        <p class="text-[10px] text-amber-600 mt-0.5">텍스트 내에 '자산총계', '매출액', '자본총계/자기자본', '자본금' 등의 주요 재무 키워드 및 금액이 정합성 있게 포함되어 있는지 확인해 주세요.</p>
-                    </div>
-                `;
-            }
-            lucide.createIcons();
         }
     </script>
 </body>
