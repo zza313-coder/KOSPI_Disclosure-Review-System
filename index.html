@@ -134,7 +134,7 @@
 
                 <!-- Search Input -->
                 <div class="relative mb-3">
-                    <input type="text" id="disclosureSearch" oninput="filterDisclosureItems()" class="block w-full rounded-lg border-slate-300 pl-9 pr-3 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2" placeholder="공시 유형 또는 키워드 검색 (예: 공급계약, 종속회사)...">
+                    <input type="text" id="disclosureSearch" oninput="filterDisclosureItems()" class="block w-full rounded-lg border-slate-300 pl-9 pr-3 focus:border-krx-blue focus:ring-krx-blue sm:text-sm border p-2" placeholder="공시 유형 또는 키워드 검색 (예: 공급계약, 유형자산)...">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
                     </div>
@@ -544,7 +544,7 @@
         <div id="tabContent_qa" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
             <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
                 <i data-lucide="message-square" class="w-5 h-5 text-krx-blue"></i>
-                실무 다빈출 공시 헬퍼 (FAQ 및 대화형 시뮬레이터)
+                공시 실무 질의응답 (Q&A 헬퍼)
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
@@ -634,7 +634,7 @@
                 deadlineType: '익일',
                 deadlineDesc: '사유발생일 다음 날 18시까지 신고',
                 inputLabel: '계약 금액 (해당 지분액)',
-                mandatoryBasis: 'consolidated',
+                mandatoryBasis: 'consolidated', // Correctly reverted to consolidated
                 desc: '단일판매계약 또는 공급계약을 체결하거나 계약을 해지한 때 공시 의무가 발생합니다.'
             },
             business_halt: {
@@ -704,7 +704,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고 (이사회 결의 또는 취득 계약일 중 빠른 날)',
                 inputLabel: '유형자산 거래/처분 금액',
-                mandatoryBasis: 'consolidated',
+                mandatoryBasis: 'consolidated', // Correctly reverted to consolidated
                 desc: '임대용 부동산을 포함한 고정자산의 양수/양도액 및 사모 투자기구 자산 등의 금액 기준입니다.'
             },
             equity_investment: {
@@ -718,7 +718,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '출자 인수액 또는 처분 결정액',
-                mandatoryBasis: 'consolidated',
+                mandatoryBasis: 'consolidated', // Correctly reverted to consolidated
                 desc: '지배지분이나 투자 목적으로 타사의 발행 주식을 대량 취득·매각하기로 이사회 결의한 경우입니다.'
             },
             facility_investment: {
@@ -774,7 +774,7 @@
                 deadlineType: '당일',
                 deadlineDesc: '사유발생일 당일 18시까지 신고',
                 inputLabel: '담보 제공 한도액 또는 보증액',
-                mandatoryBasis: 'consolidated',
+                mandatoryBasis: 'consolidated', // Correctly reverted to consolidated
                 desc: '일반적인 영업 활동상 하자보증, 납세보증 등을 제외한 타 법인을 위해 채무 보증하는 건을 지칭합니다.'
             },
             debt_assume_forgive: {
@@ -862,7 +862,7 @@
                 desc: '일반 매출 채권을 제외한 단장기 대여금 등의 대손 충당 및 대손 처리 확정 시의 심사 기준선입니다.'
             },
             // --- SUBSIDIARY DISCLOSURES (종속회사 주요경영사항 제8조의2) ---
-            // Under Art 3 Para 7 Item 4, Parent Asset checking under Art 8 Para 1 / Art 16 is STRICTLY based on Separate Financial Statements (별도재무제표)
+            // Reverted to consolidated under KOSPI General Rule since Art 3 Para 7 Item 4 only explicitly exempts Art 8 Para 1 and Art 16.
             sub_halt: {
                 id: 'sub_halt',
                 category: '종속회사 공시',
@@ -874,8 +874,8 @@
                 deadlineType: '익일',
                 deadlineDesc: '사실 확인일 다음 날 18시까지 신고',
                 inputLabel: '종속회사 정지영업부문 최근 매출액',
-                mandatoryBasis: 'separate',
-                desc: '종속회사의 정지 영업부문 매출액이 지배회사(더블유게임즈) 최근 연간 매출액의 5% 이상인 경우 해당됩니다.'
+                mandatoryBasis: 'consolidated',
+                desc: '종속회사의 정지 영업부문 매출액이 지배회사(더블유게임즈) 최근 연간 연결매출액의 5% 이상인 경우 해당됩니다.'
             },
             sub_capital: {
                 id: 'sub_capital',
@@ -888,8 +888,8 @@
                 deadlineType: '익일',
                 deadlineDesc: '사실 확인일 다음 날 18시까지 신고',
                 inputLabel: '종속회사 자본 증감자 가액',
-                mandatoryBasis: 'separate',
-                desc: '종속회사의 유무상증자 또는 감자 결정액이 지배회사 최근 자기자본의 5% 이상인 경우 대상이 됩니다.'
+                mandatoryBasis: 'consolidated',
+                desc: '종속회사의 유무상증자 또는 감자 결정액이 지배회사 최근 연결자기자본의 5% 이상인 경우 대상이 됩니다.'
             },
             sub_asset_deal: {
                 id: 'sub_asset_deal',
@@ -902,8 +902,8 @@
                 deadlineType: '익일',
                 deadlineDesc: '사실 확인일 다음 날 18시까지 신고',
                 inputLabel: '종속회사 취득/처분 대상 자산액',
-                mandatoryBasis: 'separate',
-                desc: '종속회사의 영업양수도 또는 일반 자산 양수도액이 지배회사 자산총액의 5% 이상일 시 적용됩니다.'
+                mandatoryBasis: 'consolidated',
+                desc: '종속회사의 영업양수도 또는 일반 자산 양수도액이 지배회사 연결자산총액의 5% 이상일 시 적용됩니다.'
             },
             sub_cb_eb: {
                 id: 'sub_cb_eb',
@@ -916,7 +916,7 @@
                 deadlineType: '익일',
                 deadlineDesc: '사유발생 사실 확인 다음 날 18시까지 신고',
                 inputLabel: '사채 발행 결정 총액',
-                mandatoryBasis: 'separate',
+                mandatoryBasis: 'consolidated',
                 desc: '종속회사가 지배회사(더블유게임즈) 주식을 교환대상으로 삼아 전환사채(CB)나 교환사채(EB) 등을 발행하기로 결의한 경우입니다.'
             },
             sub_lawsuit: {
@@ -930,8 +930,8 @@
                 deadlineType: '익일',
                 deadlineDesc: '소송 피소 사실 확인 다음 날 18시까지 신고',
                 inputLabel: '피소 소송 청구 가액',
-                mandatoryBasis: 'separate',
-                desc: '종속회사를 상대로 제기된 소송의 소송 청구액이 지배회사(더블유게임즈) 최근 자산총액의 5% 이상인 경우입니다.'
+                mandatoryBasis: 'consolidated',
+                desc: '종속회사를 상대로 제기된 소송의 소송 청구액이 지배회사(더블유게임즈) 최근 연결자산총액의 5% 이상인 경우입니다.'
             },
             sub_merger: {
                 id: 'sub_merger',
@@ -943,9 +943,8 @@
                 ratioLarge: 0.10,
                 deadlineType: '당일',
                 deadlineDesc: '합병/분할 이사회 결의 당일 18시까지 즉시 신고',
-                inputLabel: '대상 종속회사 자산총액',
-                mandatoryBasis: 'separate',
-                desc: '지배회사(별도 자산총액 기준) 자산의 10% 이상인 종속회사가 합병, 분할 결의를 한 경우 주요종속회사 지위가 획득되어 즉시 공시 의무가 발생합니다.'
+                mandatoryBasis: 'consolidated',
+                desc: '지배회사(연결 자산총액 기준) 자산의 10% 이상인 종속회사가 합병, 분할 결의를 한 경우 주요종속회사 지위가 획득되어 즉시 공시 의무가 발생합니다.'
             }
         };
 
