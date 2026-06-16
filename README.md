@@ -4,7 +4,7 @@
 
 🔗 Live Demo
 
-👉 [여기에 배포된 GitHub Pages 주소를 적어주세요] (예: https://your-username.github.io/your-repo-name)
+👉 [여기에 배포된 GitHub Pages 주소를 적어주세요] (예: [https://your-username.github.io/your-repo-name](https://zza313-coder.github.io/KOSPI_Disclosure-Review-System/))
 
 🌟 주요 기능
 
